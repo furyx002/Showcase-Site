@@ -199,11 +199,7 @@ export default function Home() {
                     <h3 className="text-[13px] font-bold text-gray-900 uppercase tracking-wide mb-1 hover:text-blue-600 transition-colors">{product.name}</h3>
                     <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-2">COMPLETE SET | PREMIUM QUALITY</p>
                     
-                    {/* Stars */}
-                    <div className="flex items-center justify-center gap-1 mb-2">
-                      {[1,2,3,4,5].map(s => <Star key={s} className="w-3 h-3 fill-yellow-400 text-yellow-400" />)}
-                      <span className="text-[11px] text-gray-500 ml-1">5 Reviews</span>
-                    </div>
+
 
                     {/* Pricing */}
                     <div className="flex items-center justify-center gap-2 mt-auto">

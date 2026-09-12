@@ -19,6 +19,7 @@ export const metadata = {
 
 import SiteHeader from "../components/SiteHeader";
 import SiteFooter from "../components/SiteFooter";
+import { Toaster } from "react-hot-toast";
 
 export default function RootLayout({ children }) {
   return (
@@ -27,6 +28,7 @@ export default function RootLayout({ children }) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-white text-slate-900 transition-colors duration-200">
+        <Toaster position="top-center" />
         <SiteHeader />
         <main className="flex-1 w-full">{children}</main>
         <SiteFooter />

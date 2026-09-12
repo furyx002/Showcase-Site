@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { api } from '../lib/api';
 import { Settings, Package, FolderTree, Plus, Edit3, Trash2, RefreshCw, X, Image as ImageIcon, Search, LogOut, LayoutDashboard, Menu } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
 export default function EditSettingsView({ onLogout }) {
   const [activeTab, setActiveTab] = useState('products'); // 'dashboard', 'products', 'categories', 'settings'
@@ -54,8 +55,7 @@ export default function EditSettingsView({ onLogout }) {
   }, []);
 
   const showFeedback = (msg) => {
-    setMessage(msg);
-    setTimeout(() => setMessage(null), 3000);
+    toast.success(msg);
   };
 
   const handleImageUpload = async (e, callback) => {
@@ -73,7 +73,7 @@ export default function EditSettingsView({ onLogout }) {
       }
     } catch (err) {
       console.error(err);
-      alert(err.message || 'Failed to upload image');
+      toast.error(err.message || 'Failed to upload image');
     } finally {
       setLoading(false);
     }
@@ -87,7 +87,7 @@ export default function EditSettingsView({ onLogout }) {
       showFeedback('Global settings saved');
       loadData();
     } catch (err) {
-      alert(err.message || 'Failed to save settings');
+      toast.error(err.message || 'Failed to save settings');
     }
   };
 
@@ -112,7 +112,7 @@ export default function EditSettingsView({ onLogout }) {
       showFeedback('Product saved successfully');
       loadData();
     } catch (err) {
-      alert(err.message || 'Failed to save product');
+      toast.error(err.message || 'Failed to save product');
     }
   };
 
@@ -123,7 +123,7 @@ export default function EditSettingsView({ onLogout }) {
       showFeedback('Product deleted');
       loadData();
     } catch (err) {
-      alert(err.message || 'Failed to delete product');
+      toast.error(err.message || 'Failed to delete product');
     }
   };
 
@@ -149,7 +149,7 @@ export default function EditSettingsView({ onLogout }) {
       showFeedback('Category saved successfully');
       loadData();
     } catch (err) {
-      alert(err.message || 'Failed to save category');
+      toast.error(err.message || 'Failed to save category');
     }
   };
 
@@ -160,7 +160,7 @@ export default function EditSettingsView({ onLogout }) {
       showFeedback('Category deleted');
       loadData();
     } catch (err) {
-      alert(err.message || 'Failed to delete category');
+      toast.error(err.message || 'Failed to delete category');
     }
   };
 

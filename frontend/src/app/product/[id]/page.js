@@ -6,6 +6,7 @@ import { api } from '../../../lib/api';
 import { Star, MessageCircle, ArrowLeft, Heart, Share2, ShieldCheck, Truck } from 'lucide-react';
 import Link from 'next/link';
 import { useSettings } from '../../../lib/useSettings';
+import { toast } from 'react-hot-toast';
 
 export default function ProductDetails() {
   const { id } = useParams();
@@ -103,7 +104,7 @@ export default function ProductDetails() {
                         await navigator.share({ title: product.name, url: window.location.href });
                       } else {
                         await navigator.clipboard.writeText(window.location.href);
-                        alert('Link copied to clipboard!');
+                        toast.success('Link copied to clipboard!');
                       }
                     } catch (e) {
                       console.error(e);
@@ -154,12 +155,7 @@ export default function ProductDetails() {
             
             <h1 className="text-4xl md:text-5xl font-black text-gray-900 leading-tight mb-4 uppercase">{product.name}</h1>
             
-            <div className="flex items-center gap-4 mb-6">
-              <div className="flex items-center">
-                {[1, 2, 3, 4, 5].map(s => <Star key={s} className="w-5 h-5 fill-yellow-400 text-yellow-400" />)}
-              </div>
-              <span className="text-sm font-semibold text-gray-500 underline cursor-pointer hover:text-gray-900 transition-colors">12 Customer Reviews</span>
-            </div>
+
 
             <div className="flex items-end gap-4 mb-8">
               <span className="text-4xl font-black text-[#ff4d4f]">Rs. {product.price.toLocaleString()}</span>
