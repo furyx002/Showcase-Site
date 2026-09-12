@@ -13,7 +13,7 @@ export default function SettingsPage() {
     setLoading(true);
     try {
       const res = await api.getSettings();
-      setSettings(res || {});
+      setSettings(res?.data || {});
     } catch (err) {
       toast.error('Failed to load settings');
       console.error(err);

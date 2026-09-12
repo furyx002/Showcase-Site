@@ -17,7 +17,8 @@ export default function Home() {
   const { settings } = useSettings();
 
   const whatsappNumber = settings?.whatsappNumber || '+923006255511';
-  const heroSliders = settings?.heroSliders?.length > 0 ? settings.heroSliders : ['/slider1.jpg', '/slider2.jpg'];
+  const activeSliders = (settings?.heroSliders || []).filter(url => url && url.trim() !== '');
+  const heroSliders = activeSliders.length > 0 ? activeSliders : ['/slider1.jpg', '/slider2.jpg'];
 
   useEffect(() => {
     loadProducts();
@@ -243,21 +244,21 @@ export default function Home() {
           </h2>
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 divide-x divide-gray-200">
-            <div className="flex flex-col items-center">
-              <h3 className="text-4xl font-bold text-yellow-500 mb-2">10M+</h3>
-              <p className="text-[10px] font-bold text-black tracking-widest uppercase">TRUSTED CUSTOMERS</p>
+            <div className="flex flex-col items-center text-center px-1">
+              <h3 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-black text-yellow-500 mb-1 sm:mb-2">100%</h3>
+              <p className="text-[8px] sm:text-[10px] font-bold text-black tracking-widest uppercase">ORIGINAL PRODUCT</p>
             </div>
-            <div className="flex flex-col items-center">
-              <h3 className="text-4xl font-bold text-yellow-500 mb-2">100%</h3>
-              <p className="text-[10px] font-bold text-black tracking-widest uppercase"><span className="text-gray-500">AUTHENTIC</span> 304 Grade Steel</p>
+            <div className="flex flex-col items-center text-center px-1">
+              <h3 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-black text-yellow-500 mb-1 sm:mb-2">PREMIUM</h3>
+              <p className="text-[8px] sm:text-[10px] font-bold text-black tracking-widest uppercase"><span className="text-gray-500 block sm:inline">AUTHENTIC</span> 304 Grade Steel</p>
             </div>
-            <div className="flex flex-col items-center">
-              <h3 className="text-4xl font-bold text-yellow-500 mb-2">40+</h3>
-              <p className="text-[10px] font-bold text-black tracking-widest uppercase"><span className="text-gray-500">YEARS</span> Industry Experience</p>
+            <div className="flex flex-col items-center text-center px-1">
+              <h3 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-black text-yellow-500 mb-1 sm:mb-2">GUARANTEED</h3>
+              <p className="text-[8px] sm:text-[10px] font-bold text-black tracking-widest uppercase"><span className="text-gray-500 block sm:inline">RUST-FREE</span> QUALITY</p>
             </div>
-            <div className="flex flex-col items-center">
-              <h3 className="text-4xl font-bold text-yellow-500 mb-2">VERIFIED</h3>
-              <p className="text-[10px] font-bold text-black tracking-widest uppercase"><span className="text-gray-500">by</span> INTERNATIONAL LAB</p>
+            <div className="flex flex-col items-center text-center px-1">
+              <h3 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-black text-yellow-500 mb-1 sm:mb-2">NATIONWIDE</h3>
+              <p className="text-[8px] sm:text-[10px] font-bold text-black tracking-widest uppercase"><span className="text-gray-500 block sm:inline">SECURE</span> DELIVERY</p>
             </div>
           </div>
         </div>
