@@ -93,8 +93,8 @@ export const api = {
 
   // Products
   getProducts: () => fetchAPI('/products'),
-  saveProduct: (data) => fetchAPI(data._id ? `/products/${data._id}` : '/products', {
-    method: data._id ? 'PUT' : 'POST',
+  saveProduct: (data) => fetchAPI('/products', {
+    method: 'POST',
     body: JSON.stringify(data)
   }),
   deleteProduct: (id) => fetchAPI(`/products/${id}`, { method: 'DELETE' }),

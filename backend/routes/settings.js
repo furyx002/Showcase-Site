@@ -5,7 +5,9 @@ const Setting = require('../models/Setting');
 // Default settings if not found in DB
 const DEFAULT_SETTINGS = {
   whatsappNumber: '+923006255511',
-  heroSliders: ['/slider1.jpg', '/slider2.jpg']
+  heroSliders: ['/slider1.jpg', '/slider2.jpg'],
+  marqueeEnabled: true,
+  marqueeText: 'LIMITED TIME OFFER: ENJOY FREE SHIPPING NATIONWIDE ON ALL ORDERS THIS WEEK!'
 };
 
 // GET /api/settings - Fetch all global settings
@@ -21,7 +23,8 @@ router.get('/', async (req, res) => {
 
     res.json({ success: true, data: settings });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    // Return default settings if DB fails
+    res.json({ success: true, data: DEFAULT_SETTINGS, warning: err.message });
   }
 });
 

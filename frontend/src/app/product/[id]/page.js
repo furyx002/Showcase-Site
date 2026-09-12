@@ -70,8 +70,7 @@ export default function ProductDetails() {
     );
   }
 
-  const fakeOriginalPrice = Math.round(product.price * 1.3);
-
+  const originalPrice = product.originalPrice || product.price;
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumb */}
@@ -92,13 +91,26 @@ export default function ProductDetails() {
           <div className="w-full lg:w-1/2 flex flex-col gap-4">
             <div className="bg-gray-50 aspect-square rounded-2xl p-8 flex items-center justify-center relative border border-gray-100 overflow-hidden group">
               <div className="absolute top-6 left-6 flex flex-col gap-2 z-10">
-                <span className="bg-[#ff4d4f] text-white text-xs font-bold px-3 py-1 uppercase tracking-wider rounded-sm shadow-md">Sale</span>
+                {product.badges && product.badges.map((badge, idx) => (
+                  <span key={idx} className="bg-[#ff4d4f] text-white text-xs font-bold px-3 py-1 uppercase tracking-wider rounded-sm shadow-md">{badge}</span>
+                ))}
               </div>
               <div className="absolute top-6 right-6 flex flex-col gap-2 z-10">
-                <button className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors">
-                  <Heart className="w-5 h-5" />
-                </button>
-                <button className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-blue-50 text-gray-400 hover:text-blue-500 transition-colors">
+                <button 
+                  onClick={async () => {
+                    try {
+                      if (navigator.share) {
+                        await navigator.share({ title: product.name, url: window.location.href });
+                      } else {
+                        await navigator.clipboard.writeText(window.location.href);
+                        alert('Link copied to clipboard!');
+                      }
+                    } catch (e) {
+                      console.error(e);
+                    }
+                  }}
+                  className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-blue-50 text-gray-400 hover:text-blue-500 transition-colors"
+                >
                   <Share2 className="w-5 h-5" />
                 </button>
               </div>
@@ -151,8 +163,12 @@ export default function ProductDetails() {
 
             <div className="flex items-end gap-4 mb-8">
               <span className="text-4xl font-black text-[#ff4d4f]">Rs. {product.price.toLocaleString()}</span>
-              <span className="text-xl font-semibold text-gray-400 line-through mb-1">Rs. {fakeOriginalPrice.toLocaleString()}</span>
-              <span className="bg-[#ff4d4f]/10 text-[#ff4d4f] font-bold text-sm px-2 py-1 rounded-sm mb-1 ml-2">Save 30%</span>
+              {originalPrice > product.price && (
+                <>
+                  <span className="text-xl font-semibold text-gray-400 line-through mb-1">Rs. {originalPrice.toLocaleString()}</span>
+                  <span className="bg-[#ff4d4f]/10 text-[#ff4d4f] font-bold text-sm px-2 py-1 rounded-sm mb-1 ml-2">Save {Math.round(((originalPrice - product.price) / originalPrice) * 100)}%</span>
+                </>
+              )}
             </div>
 
             <p className="text-gray-600 text-lg leading-relaxed mb-10 font-light">

@@ -21,7 +21,7 @@ export default function EditSettingsView({ onLogout }) {
   // Form states
   const [editingProduct, setEditingProduct] = useState(null);
   const [productForm, setProductForm] = useState({
-    name: '', category: 'Wash Basins', price: '', stock: 100, images: []
+    name: '', category: 'Wash Basins', price: '', originalPrice: '', stock: 100, images: [], badges: ''
   });
   
   const [editingCategory, setEditingCategory] = useState(null);
@@ -99,8 +99,10 @@ export default function EditSettingsView({ onLogout }) {
         name: productForm.name,
         category: productForm.category,
         price: parseFloat(productForm.price),
+        originalPrice: parseFloat(productForm.originalPrice) || 0,
         stock: parseInt(productForm.stock) || 100,
-        images: productForm.images || []
+        images: productForm.images || [],
+        badges: productForm.badges ? productForm.badges.split(',').map(b => b.trim()).filter(b => b) : []
       };
       if (editingProduct && editingProduct._id) {
         payload._id = editingProduct._id;
@@ -247,7 +249,7 @@ export default function EditSettingsView({ onLogout }) {
               <button
                 onClick={() => {
                   setEditingProduct({ name: '', category: categories[0]?.title || 'Wash Basins', price: '', stock: 100, images: [] });
-                  setProductForm({ name: '', category: categories[0]?.title || 'Wash Basins', price: '', stock: 100, images: [] });
+                  setProductForm({ name: '', category: categories[0]?.title || 'Wash Basins', price: '', originalPrice: '', stock: 100, images: [], badges: '' });
                 }}
                 className="bg-black hover:bg-gray-800 text-white font-bold py-2 px-4 rounded-md text-sm flex items-center gap-2 transition-colors"
               >
@@ -353,11 +355,21 @@ export default function EditSettingsView({ onLogout }) {
                         <div className="grid grid-cols-2 gap-6">
                           <div>
                             <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Price (PKR)</label>
-                            <input type="number" required value={productForm.price} onChange={(e) => setProductForm({ ...productForm, price: e.target.value })} className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-black rounded-lg px-4 py-3 text-sm font-mono font-bold outline-none transition-colors" placeholder="0.00" />
+                            <input type="number" min="0" required value={productForm.price} onChange={(e) => setProductForm({ ...productForm, price: e.target.value })} className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-black rounded-lg px-4 py-3 text-sm font-mono font-bold outline-none transition-colors" placeholder="0.00" />
                           </div>
                           <div>
+                            <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Original Price</label>
+                            <input type="number" min="0" value={productForm.originalPrice} onChange={(e) => setProductForm({ ...productForm, originalPrice: e.target.value })} className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-black rounded-lg px-4 py-3 text-sm font-mono font-bold outline-none transition-colors" placeholder="e.g. 15000" />
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-6">
+                          <div>
                             <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Stock Level</label>
-                            <input type="number" value={productForm.stock} onChange={(e) => setProductForm({ ...productForm, stock: e.target.value })} className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-black rounded-lg px-4 py-3 text-sm font-mono font-bold outline-none transition-colors" placeholder="100" />
+                            <input type="number" min="0" value={productForm.stock} onChange={(e) => setProductForm({ ...productForm, stock: e.target.value })} className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-black rounded-lg px-4 py-3 text-sm font-mono font-bold outline-none transition-colors" placeholder="100" />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Badges (comma sep)</label>
+                            <input type="text" value={productForm.badges} onChange={(e) => setProductForm({ ...productForm, badges: e.target.value })} className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-black rounded-lg px-4 py-3 text-sm font-semibold outline-none transition-colors" placeholder="e.g. SALE, BUNDLE" />
                           </div>
                         </div>
                       </div>
@@ -473,7 +485,7 @@ export default function EditSettingsView({ onLogout }) {
                                       onClick={() => {
                                         setEditingProduct(p);
                                         const imagesArr = p.images && p.images.length > 0 ? p.images : (p.image ? [p.image] : []);
-                                        setProductForm({ name: p.name, category: p.category, price: p.price, stock: p.stock || 100, images: imagesArr });
+                                        setProductForm({ name: p.name, category: p.category, price: p.price, originalPrice: p.originalPrice || '', stock: p.stock || 100, images: imagesArr, badges: (p.badges || []).join(', ') });
                                       }}
                                       className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                                       title="Edit Product"
@@ -620,6 +632,33 @@ export default function EditSettingsView({ onLogout }) {
                   </div>
                 </section>
 
+                {/* Marquee Info */}
+                <section>
+                  <h3 className="text-sm font-black text-black mb-4 uppercase tracking-widest border-b border-gray-100 pb-2">Marquee Banner</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Enable Marquee</label>
+                      <select
+                        value={settings.marqueeEnabled === false ? 'false' : 'true'}
+                        onChange={(e) => setSettings({ ...settings, marqueeEnabled: e.target.value === 'true' })}
+                        className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-black rounded-lg px-4 py-3 text-sm text-black font-semibold outline-none transition-colors"
+                      >
+                        <option value="true">Enabled</option>
+                        <option value="false">Disabled</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Marquee Text</label>
+                      <input
+                        type="text"
+                        value={settings.marqueeText || ''}
+                        onChange={(e) => setSettings({ ...settings, marqueeText: e.target.value })}
+                        className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-black rounded-lg px-4 py-3 text-sm text-black font-semibold outline-none transition-colors"
+                        placeholder="e.g. LIMITED TIME OFFER..."
+                      />
+                    </div>
+                  </div>
+                </section>
                 {/* Sliders */}
                 <section>
                   <div className="flex justify-between items-end mb-4 border-b border-gray-100 pb-2">

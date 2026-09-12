@@ -109,13 +109,15 @@ function ShopAllContent() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {filteredProducts.map(product => {
-              const fakeOriginalPrice = Math.round(product.price * 1.3);
+              const originalPrice = product.originalPrice || product.price;
               return (
                 <Link href={`/product/${product._id}`} key={product._id} className="group flex flex-col relative block cursor-pointer">
                   
                   {/* Badges */}
                   <div className="absolute top-2 left-2 z-10 flex flex-col gap-1">
-                    <span className="bg-[#ff4d4f] text-white text-[10px] font-bold px-2 py-0.5 uppercase tracking-wider">Sale</span>
+                    {product.badges && product.badges.map((badge, idx) => (
+                      <span key={idx} className="bg-[#ff4d4f] text-white text-[10px] font-bold px-2 py-0.5 uppercase tracking-wider">{badge}</span>
+                    ))}
                   </div>
 
                   {/* Image */}
@@ -124,13 +126,13 @@ function ShopAllContent() {
                     <img 
                       src={(product.images && product.images.length > 0) ? product.images[0] : (product.image || "https://images.unsplash.com/photo-1620626011761-996317b8d101?auto=format&fit=crop&q=80&w=400")} 
                       alt={product.name} 
-                      className="absolute inset-0 w-full h-full object-cover transition-all duration-700 ease-in-out group-hover/img:opacity-0 group-hover/img:scale-110" 
+                      className="absolute inset-0 w-full h-full object-cover transition-all duration-700 ease-in-out lg:group-hover/img:opacity-0 lg:group-hover/img:scale-110" 
                     />
                     {/* Secondary Hover Image */}
                     <img 
-                      src={(product.images && product.images.length > 1) ? product.images[1] : (product.image ? product.image.replace('.png', '_alt.png') : "https://images.unsplash.com/photo-1585058178306-03c00cb571d8?auto=format&fit=crop&q=80&w=400")} 
+                      src={(product.images && product.images.length > 1) ? product.images[1] : (product.image ? product.image.replace('.png', '_alt.png') : "https://images.unsplash.com/photo-1620626011761-996317b8d101?auto=format&fit=crop&q=80&w=400")} 
                       alt={`${product.name} alternate view`} 
-                      className="absolute inset-0 w-full h-full object-cover opacity-0 scale-95 transition-all duration-700 ease-in-out group-hover/img:opacity-100 group-hover/img:scale-105" 
+                      className="absolute inset-0 w-full h-full object-cover opacity-0 scale-95 transition-all duration-700 ease-in-out lg:group-hover/img:opacity-100 lg:group-hover/img:scale-105" 
                     />
                   </div>
 
@@ -143,7 +145,9 @@ function ShopAllContent() {
                       {/* Pricing */}
                       <div className="flex items-center justify-center gap-2 mt-auto pt-2">
                         <span className="text-[#ff4d4f] font-bold">Rs.{product.price.toLocaleString()}</span>
-                        <span className="text-gray-400 text-xs line-through">Rs.{fakeOriginalPrice.toLocaleString()}</span>
+                        {originalPrice > product.price && (
+                          <span className="text-gray-400 text-xs line-through">Rs.{originalPrice.toLocaleString()}</span>
+                        )}
                       </div>
                     </div>
                   </div>
