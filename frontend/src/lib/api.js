@@ -52,25 +52,10 @@ export const api = {
     const cleanEmail = (email || '').toLowerCase().trim();
     
     // Attempt backend API authentication first
-    try {
-      const res = await fetchAPI('/auth/login', {
-        method: 'POST',
-        body: JSON.stringify({ email: cleanEmail, password })
-      });
-      return res;
-    } catch (backendErr) {
-      // Client-side fallback authentication for admin@sanitary.com / furyisop56
-      if (cleanEmail === 'admin@sanitary.com' && password === 'furyisop56') {
-        const mockUser = { id: 'admin_001', name: 'Sanitary Store Admin', email: 'admin@sanitary.com', role: 'ADMIN' };
-        const mockToken = 'mock_jwt_token_store_admin_furyisop56';
-        return {
-          success: true,
-          message: 'Login successful',
-          data: { token: mockToken, user: mockUser }
-        };
-      }
-      throw new Error(backendErr.message || 'Invalid email or password.');
-    }
+    return fetchAPI('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email: cleanEmail, password })
+    });
   },
 
   getMe: () => fetchAPI('/auth/me'),

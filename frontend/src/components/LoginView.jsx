@@ -37,10 +37,10 @@ export default function LoginView({ onLoginSuccess }) {
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl pointer-events-none"></div>
       <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-blue-500/5 rounded-full blur-3xl pointer-events-none"></div>
 
-      <div className="w-full max-w-md space-y-6 relative z-10 animate-fadeIn">
+      <div className="w-full max-w-md space-y-6 relative z-10">
         
         {/* Brand Header */}
-        <div className="text-center space-y-3">
+        <div className="text-center space-y-3 animate-fade-in-up">
           <div className="relative inline-block group">
             <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-blue-400 rounded-2xl blur opacity-40 group-hover:opacity-70 transition duration-300"></div>
             <div className="relative w-16 h-16 rounded-2xl bg-[#121319] border border-white/10 flex items-center justify-center text-3xl mx-auto shadow-2xl">
@@ -56,7 +56,7 @@ export default function LoginView({ onLoginSuccess }) {
         </div>
 
         {/* Login Form Card */}
-        <form onSubmit={handleLogin} className="glass-panel rounded-3xl p-6 sm:p-8 space-y-5 shadow-2xl">
+        <form onSubmit={handleLogin} className="glass-panel rounded-3xl p-6 sm:p-8 space-y-5 shadow-2xl animate-fade-in-up delay-100">
           
           <div className="flex items-center justify-between border-b border-white/[0.08] pb-4">
             <span className="text-xs font-bold text-zinc-300 uppercase tracking-wider flex items-center space-x-2">
@@ -129,7 +129,7 @@ export default function LoginView({ onLoginSuccess }) {
 
         </form>
 
-        <p className="text-center text-[11px] text-zinc-500 font-medium">
+        <p className="text-center text-[11px] text-zinc-500 font-medium animate-fade-in-up delay-200">
           Sanitary Store Admin System • 2026
         </p>
       </div>

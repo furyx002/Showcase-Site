@@ -8,6 +8,7 @@ import { useSettings } from '../lib/useSettings';
 
 export default function Home() {
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('ALL');
@@ -31,10 +32,14 @@ export default function Home() {
 
   const loadProducts = async () => {
     try {
-      const res = await api.getProducts();
-      setProducts(res.data || []);
+      const [prodRes, catRes] = await Promise.all([
+        api.getProducts(),
+        api.getCategories()
+      ]);
+      setProducts(prodRes.data || []);
+      setCategories(catRes || []);
     } catch (err) {
-      console.error('Failed to load products:', err);
+      console.error('Failed to load data:', err);
       setError('Failed to connect to the server. Please try again later.');
     } finally {
       setLoading(false);
@@ -115,31 +120,28 @@ export default function Home() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 h-auto lg:h-[600px]">
           
           {/* Left Large Column */}
-          <div className="relative group overflow-hidden bg-black h-[400px] lg:h-full">
-            <img src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&q=80&w=1000" alt="Faucets" className="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex flex-col justify-end p-8">
-              <span className="text-gray-400 text-sm tracking-widest font-semibold uppercase mb-1">Sanitary</span>
-              <h3 className="text-4xl md:text-5xl font-black text-white leading-none mb-6">FAUCETS &<br/>MIXERS</h3>
-              <Link href="/shop-all?category=Faucets" className="bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-2.5 px-6 w-max flex items-center gap-2 transition-colors">
-                SHOP NOW <ArrowRight className="w-4 h-4" />
-              </Link>
+          {categories.length > 0 && (
+            <div className="relative group overflow-hidden bg-black h-[400px] lg:h-full">
+              <img src={categories[0].image || "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&q=80&w=1000"} alt={categories[0].title} className="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex flex-col justify-end p-8">
+                <span className="text-gray-400 text-sm tracking-widest font-semibold uppercase mb-1">Sanitary</span>
+                <h3 className="text-4xl md:text-5xl font-black text-white leading-none mb-6 whitespace-pre-line">{categories[0].title}</h3>
+                <Link href={`/shop-all?category=${encodeURIComponent(categories[0].title.replace(/\n/g, ' '))}`} className="bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-2.5 px-6 w-max flex items-center gap-2 transition-colors">
+                  SHOP NOW <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Right Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 grid-rows-4 sm:grid-rows-2 gap-4 h-[1000px] sm:h-[600px] lg:h-full">
-            {[
-              { title: "MUSLIM SHOWER\n& HOSES", img: "/demo_shower.png", category: "Showers" },
-              { title: "RAIN SHOWERS", img: "/demo_shower_alt.png", category: "Showers" },
-              { title: "PLUMBING\nESSENTIALS", img: "/demo_faucet_alt.png", category: "Accessories" },
-              { title: "ACCESSORIES", img: "/demo_mirror.png", category: "Accessories" }
-            ].map((cat, i) => (
+            {categories.slice(1, 5).map((cat, i) => (
               <div key={i} className="relative group overflow-hidden bg-black w-full h-full">
-                <img src={cat.img} alt={cat.title} className="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:scale-105 transition-transform duration-700 grayscale" />
+                <img src={cat.image || "/demo_shower.png"} alt={cat.title} className="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:scale-105 transition-transform duration-700 grayscale" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent flex flex-col justify-end p-6 z-10">
                   <span className="text-gray-400 text-xs tracking-widest font-semibold uppercase mb-1">Sanitary</span>
                   <h3 className="text-xl md:text-2xl font-black text-white leading-tight mb-4 whitespace-pre-line">{cat.title}</h3>
-                  <Link href={`/shop-all?category=${encodeURIComponent(cat.category)}`} className="bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-1.5 px-4 text-xs w-max flex items-center gap-1 transition-colors relative z-20">
+                  <Link href={`/shop-all?category=${encodeURIComponent(cat.title.replace(/\n/g, ' '))}`} className="bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-1.5 px-4 text-xs w-max flex items-center gap-1 transition-colors relative z-20">
                     SHOP NOW <ArrowRight className="w-3 h-3" />
                   </Link>
                 </div>
