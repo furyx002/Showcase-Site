@@ -11,7 +11,7 @@ export default function EditSettingsView({ onLogout }) {
   
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [settings, setSettings] = useState({ whatsappNumber: '', heroSliders: [] });
+  const [settings, setSettings] = useState({ whatsappNumber: '', heroSliders: [], faqs: [] });
   
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState(null);
@@ -116,15 +116,35 @@ export default function EditSettingsView({ onLogout }) {
     }
   };
 
-  const handleDeleteProduct = async (productId) => {
-    if (!confirm('Are you sure you want to delete this product?')) return;
-    try {
-      await api.deleteProduct(productId);
-      showFeedback('Product deleted');
-      loadData();
-    } catch (err) {
-      toast.error(err.message || 'Failed to delete product');
-    }
+  const handleDeleteProduct = (productId) => {
+    toast((t) => (
+      <div>
+        <p className="mb-2 font-semibold text-gray-900">Are you sure you want to delete this product?</p>
+        <div className="flex gap-2">
+          <button 
+            className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600"
+            onClick={async () => {
+              toast.dismiss(t.id);
+              try {
+                await api.deleteProduct(productId);
+                showFeedback('Product deleted');
+                loadData();
+              } catch (err) {
+                toast.error(err.message || 'Failed to delete product');
+              }
+            }}
+          >
+            Delete
+          </button>
+          <button 
+            className="bg-gray-200 text-gray-800 px-3 py-1 rounded text-sm hover:bg-gray-300"
+            onClick={() => toast.dismiss(t.id)}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    ), { duration: Infinity });
   };
 
   const removeImage = (index) => {
@@ -153,15 +173,35 @@ export default function EditSettingsView({ onLogout }) {
     }
   };
 
-  const handleDeleteCategory = async (catId) => {
-    if (!confirm('Are you sure you want to delete this category?')) return;
-    try {
-      await api.deleteCategory(catId);
-      showFeedback('Category deleted');
-      loadData();
-    } catch (err) {
-      toast.error(err.message || 'Failed to delete category');
-    }
+  const handleDeleteCategory = (catId) => {
+    toast((t) => (
+      <div>
+        <p className="mb-2 font-semibold text-gray-900">Are you sure you want to delete this category?</p>
+        <div className="flex gap-2">
+          <button 
+            className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600"
+            onClick={async () => {
+              toast.dismiss(t.id);
+              try {
+                await api.deleteCategory(catId);
+                showFeedback('Category deleted');
+                loadData();
+              } catch (err) {
+                toast.error(err.message || 'Failed to delete category');
+              }
+            }}
+          >
+            Delete
+          </button>
+          <button 
+            className="bg-gray-200 text-gray-800 px-3 py-1 rounded text-sm hover:bg-gray-300"
+            onClick={() => toast.dismiss(t.id)}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    ), { duration: Infinity });
   };
 
   const filteredProducts = useMemo(() => {
@@ -734,6 +774,70 @@ export default function EditSettingsView({ onLogout }) {
                     )}
                   </div>
                 </section>
+
+                {/* FAQs */}
+                <div className="mt-8">
+                  <div className="flex justify-between items-center mb-6">
+                    <h3 className="text-sm font-black text-black uppercase tracking-widest">Frequently Asked Questions</h3>
+                    <button 
+                      type="button" 
+                      onClick={() => setSettings(s => ({ ...s, faqs: [...(s.faqs || []), { question: '', answer: '' }] }))}
+                      className="bg-black hover:bg-gray-800 text-white font-bold py-1.5 px-3 rounded-md text-xs flex items-center gap-1 transition-colors"
+                    >
+                      <Plus className="w-3 h-3" /> Add FAQ
+                    </button>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    {(settings.faqs || []).map((faq, idx) => (
+                      <div key={idx} className="p-4 rounded-xl border border-gray-200 bg-gray-50 relative group">
+                        <div className="flex justify-between items-center mb-2">
+                          <label className="text-xs font-bold text-gray-700 uppercase tracking-widest">FAQ {idx + 1}</label>
+                          <button 
+                            type="button"
+                            onClick={() => {
+                              const newFaqs = [...(settings.faqs || [])];
+                              newFaqs.splice(idx, 1);
+                              setSettings({ ...settings, faqs: newFaqs });
+                            }}
+                            className="text-red-500 hover:text-red-700 font-bold text-xs"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                        <div className="space-y-3">
+                          <input 
+                            type="text" 
+                            value={faq.question || ''} 
+                            onChange={(e) => {
+                              const newFaqs = [...(settings.faqs || [])];
+                              newFaqs[idx].question = e.target.value;
+                              setSettings({ ...settings, faqs: newFaqs });
+                            }} 
+                            className="w-full bg-white border border-gray-200 rounded-md px-3 py-2 text-sm focus:border-black outline-none font-bold" 
+                            placeholder="Question" 
+                          />
+                          <textarea 
+                            value={faq.answer || ''} 
+                            onChange={(e) => {
+                              const newFaqs = [...(settings.faqs || [])];
+                              newFaqs[idx].answer = e.target.value;
+                              setSettings({ ...settings, faqs: newFaqs });
+                            }} 
+                            className="w-full bg-white border border-gray-200 rounded-md px-3 py-2 text-sm focus:border-black outline-none min-h-[80px]" 
+                            placeholder="Answer" 
+                          />
+                        </div>
+                      </div>
+                    ))}
+                    
+                    {(!settings.faqs || settings.faqs.length === 0) && (
+                      <div className="text-center py-8 text-gray-400 text-xs uppercase tracking-widest border border-dashed border-gray-300 bg-white rounded-xl">
+                        No FAQs configured. Add an FAQ above.
+                      </div>
+                    )}
+                  </div>
+                </div>
 
                 <div className="pt-4">
                   <button type="submit" className="w-full py-4 bg-black hover:bg-slate-800 text-white font-black text-sm uppercase tracking-widest rounded-lg transition-colors shadow-md">

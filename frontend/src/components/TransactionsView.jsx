@@ -1,5 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
+import { toast } from 'react-hot-toast';
 import { Receipt, Search, Printer, Trash2, RefreshCw } from 'lucide-react';
 import { api } from '../lib/api';
 import ThermalReceipt from './ThermalReceipt';
@@ -32,22 +33,43 @@ export default function TransactionsView() {
     loadTransactions();
   }, []);
 
-  const handleDeleteOrder = async (order) => {
-    if (!confirm(`Are you sure you want to delete sales record ${order.orderNo} (${order.customerNo})? This action cannot be undone.`)) {
-      return;
-    }
-    setDeletingId(order._id);
-    try {
-      await api.deleteOrder(order._id);
-      if (selectedOrder && selectedOrder._id === order._id) {
-        setSelectedOrder(null);
-      }
-      await loadTransactions();
-    } catch (err) {
-      alert(err.message || 'Failed to delete order');
-    } finally {
-      setDeletingId(null);
-    }
+  const handleDeleteOrder = (order) => {
+    toast((t) => (
+      <div>
+        <p className="mb-2 font-semibold text-gray-900">Are you sure you want to delete sales record {order.orderNo} ({order.customerNo})? This action cannot be undone.</p>
+        <div className="flex gap-2">
+          <button 
+            className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600"
+            onClick={async () => {
+              toast.dismiss(t.id);
+              try {
+                setDeletingId(order._id);
+                const res = await api.deleteOrder(order._id);
+                if (!res.success) {
+                  throw new Error(res.error || 'Failed to delete order');
+                }
+                if (selectedOrder && selectedOrder._id === order._id) {
+                  setSelectedOrder(null);
+                }
+                await loadTransactions();
+              } catch (err) {
+                toast.error(err.message || 'Failed to delete order');
+              } finally {
+                setDeletingId(null);
+              }
+            }}
+          >
+            Delete
+          </button>
+          <button 
+            className="bg-gray-200 text-gray-800 px-3 py-1 rounded text-sm hover:bg-gray-300"
+            onClick={() => toast.dismiss(t.id)}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    ), { duration: Infinity });
   };
 
   const filteredOrders = orders.filter(o => {

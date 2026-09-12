@@ -126,14 +126,16 @@ function ShopAllContent() {
                     <img 
                       src={(product.images && product.images.length > 0) ? product.images[0] : (product.image || "https://images.unsplash.com/photo-1620626011761-996317b8d101?auto=format&fit=crop&q=80&w=400")} 
                       alt={product.name} 
-                      className="absolute inset-0 w-full h-full object-cover transition-all duration-700 ease-in-out lg:group-hover/img:opacity-0 lg:group-hover/img:scale-110" 
+                      className={`absolute inset-0 w-full h-full object-cover transition-all duration-700 ease-in-out ${product.images && product.images.length > 1 ? 'lg:group-hover/img:opacity-0 lg:group-hover/img:scale-110' : 'hover:scale-105'}`} 
                     />
-                    {/* Secondary Hover Image */}
-                    <img 
-                      src={(product.images && product.images.length > 1) ? product.images[1] : (product.image ? product.image.replace('.png', '_alt.png') : "https://images.unsplash.com/photo-1620626011761-996317b8d101?auto=format&fit=crop&q=80&w=400")} 
-                      alt={`${product.name} alternate view`} 
-                      className="absolute inset-0 w-full h-full object-cover opacity-0 scale-95 transition-all duration-700 ease-in-out lg:group-hover/img:opacity-100 lg:group-hover/img:scale-105" 
-                    />
+                    {/* Secondary Hover Image (Only if exists) */}
+                    {product.images && product.images.length > 1 && (
+                      <img 
+                        src={product.images[1]} 
+                        alt={`${product.name} alternate view`} 
+                        className="absolute inset-0 w-full h-full object-cover opacity-0 scale-95 transition-all duration-700 ease-in-out lg:group-hover/img:opacity-100 lg:group-hover/img:scale-105" 
+                      />
+                    )}
                   </div>
 
                   {/* Content */}

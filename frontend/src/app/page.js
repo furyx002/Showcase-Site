@@ -127,19 +127,19 @@ export default function Home() {
           </div>
 
           {/* Right Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 h-[800px] sm:h-[400px] lg:h-full">
+          <div className="grid grid-cols-1 sm:grid-cols-2 grid-rows-4 sm:grid-rows-2 gap-4 h-[1000px] sm:h-[600px] lg:h-full">
             {[
-              { title: "MUSLIM SHOWER\n& HOSES", img: "https://images.unsplash.com/photo-1620626011761-996317b8d101?auto=format&fit=crop&q=80&w=600", category: "Showers" },
-              { title: "RAIN SHOWERS", img: "https://images.unsplash.com/photo-1620626011761-996317b8d101?auto=format&fit=crop&q=80&w=600", category: "Showers" },
-              { title: "PLUMBING\nESSENTIALS", img: "https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?auto=format&fit=crop&q=80&w=600", category: "Accessories" },
-              { title: "ACCESSORIES", img: "https://images.unsplash.com/photo-1620626011761-996317b8d101?auto=format&fit=crop&q=80&w=600", category: "Accessories" }
+              { title: "MUSLIM SHOWER\n& HOSES", img: "/demo_shower.png", category: "Showers" },
+              { title: "RAIN SHOWERS", img: "/demo_shower_alt.png", category: "Showers" },
+              { title: "PLUMBING\nESSENTIALS", img: "/demo_faucet_alt.png", category: "Accessories" },
+              { title: "ACCESSORIES", img: "/demo_mirror.png", category: "Accessories" }
             ].map((cat, i) => (
-              <div key={i} className="relative group overflow-hidden bg-black h-full">
-                <img src={cat.img} alt={cat.title} className="w-full h-full object-cover opacity-50 group-hover:scale-105 transition-transform duration-700 grayscale" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent flex flex-col justify-end p-6">
+              <div key={i} className="relative group overflow-hidden bg-black w-full h-full">
+                <img src={cat.img} alt={cat.title} className="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:scale-105 transition-transform duration-700 grayscale" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent flex flex-col justify-end p-6 z-10">
                   <span className="text-gray-400 text-xs tracking-widest font-semibold uppercase mb-1">Sanitary</span>
                   <h3 className="text-xl md:text-2xl font-black text-white leading-tight mb-4 whitespace-pre-line">{cat.title}</h3>
-                  <Link href={`/shop-all?category=${encodeURIComponent(cat.category)}`} className="bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-1.5 px-4 text-xs w-max flex items-center gap-1 transition-colors">
+                  <Link href={`/shop-all?category=${encodeURIComponent(cat.category)}`} className="bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-1.5 px-4 text-xs w-max flex items-center gap-1 transition-colors relative z-20">
                     SHOP NOW <ArrowRight className="w-3 h-3" />
                   </Link>
                 </div>
@@ -154,10 +154,10 @@ export default function Home() {
       <section className="max-w-[1600px] mx-auto px-4 lg:px-8 py-16">
         
         {/* Section Header */}
-        <div className="flex items-center justify-center mb-10">
-          <div className="h-px bg-gray-300 w-1/4"></div>
-          <h2 className="text-2xl font-black tracking-widest uppercase mx-8 text-gray-900">COMPLETE SHOWER SETS</h2>
-          <div className="h-px bg-gray-300 w-1/4"></div>
+        <div className="flex items-center justify-center mb-10 w-full overflow-hidden">
+          <div className="h-px bg-gray-300 flex-1"></div>
+          <h2 className="text-lg md:text-2xl font-black tracking-widest uppercase px-4 md:px-8 text-gray-900 text-center shrink-0">COMPLETE SHOWER SETS</h2>
+          <div className="h-px bg-gray-300 flex-1"></div>
         </div>
         <div className="text-center mb-12">
           <Link href="/shop-all" className="text-sm font-semibold text-gray-500 border-b border-gray-500 pb-0.5 hover:text-black transition-colors">View All</Link>
@@ -183,14 +183,16 @@ export default function Home() {
                     <img 
                       src={(product.images && product.images.length > 0) ? product.images[0] : (product.image || "https://images.unsplash.com/photo-1620626011761-996317b8d101?auto=format&fit=crop&q=80&w=400")} 
                       alt={product.name} 
-                      className="absolute inset-0 w-full h-full object-cover transition-all duration-700 ease-in-out lg:group-hover/img:opacity-0 lg:group-hover/img:scale-110" 
+                      className={`absolute inset-0 w-full h-full object-cover transition-all duration-700 ease-in-out ${product.images && product.images.length > 1 ? 'lg:group-hover/img:opacity-0 lg:group-hover/img:scale-110' : 'hover:scale-105'}`} 
                     />
-                    {/* Secondary Hover Image */}
-                    <img 
-                      src={(product.images && product.images.length > 1) ? product.images[1] : (product.image ? product.image.replace('.png', '_alt.png') : "https://images.unsplash.com/photo-1620626011761-996317b8d101?auto=format&fit=crop&q=80&w=400")} 
-                      alt={`${product.name} alternate view`} 
-                      className="absolute inset-0 w-full h-full object-cover opacity-0 scale-95 transition-all duration-700 ease-in-out lg:group-hover/img:opacity-100 lg:group-hover/img:scale-105" 
-                    />
+                    {/* Secondary Hover Image (Only if exists) */}
+                    {product.images && product.images.length > 1 && (
+                      <img 
+                        src={product.images[1]} 
+                        alt={`${product.name} alternate view`} 
+                        className="absolute inset-0 w-full h-full object-cover opacity-0 scale-95 transition-all duration-700 ease-in-out lg:group-hover/img:opacity-100 lg:group-hover/img:scale-105" 
+                      />
+                    )}
                   </div>
 
                 {/* Content */}

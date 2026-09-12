@@ -1,5 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
+import { toast } from 'react-hot-toast';
 import { X, Play, Clock, Sparkles, User, Award } from 'lucide-react';
 import { api } from '../lib/api';
 
@@ -85,7 +86,7 @@ export default function StartSessionModal({ table, isOpen, onClose, onConfirm })
       });
       onClose();
     } catch (err) {
-      alert(err.message || 'Failed to start session');
+      toast.error(err.message || 'Failed to start session');
     } finally {
       setLoading(false);
     }

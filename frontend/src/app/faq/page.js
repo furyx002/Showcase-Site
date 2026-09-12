@@ -4,35 +4,28 @@ import React, { useState } from 'react';
 import { ChevronDown, MessageCircle } from 'lucide-react';
 import Link from 'next/link';
 
-const faqs = [
-  {
-    question: "What material are your faucets and showers made of?",
-    answer: "Our premium sanitary products are primarily crafted from 100% authentic Grade 304 Stainless Steel and high-quality brass. This ensures they are rust-proof, highly durable, and maintain their elegant finish for years to come."
-  },
-  {
-    question: "Do you offer a warranty on your products?",
-    answer: "Yes! We stand behind the quality of our products. Most of our faucets and shower sets come with a comprehensive 10-Year Rust-Free Warranty. Please check individual product details or contact us on WhatsApp for specific warranty terms."
-  },
-  {
-    question: "How long does shipping take?",
-    answer: "We offer fast and reliable shipping across Pakistan. Orders within major cities typically arrive within 2-3 business days. For other regions, please allow 3-5 business days. You will receive a tracking link once your order is dispatched."
-  },
-  {
-    question: "How do I place an order?",
-    answer: "Placing an order is simple and direct! Browse our products, and click on 'ORDER ON WHATSAPP'. This will open a chat with our sales representative, pre-filled with the product details. You can finalize your order and payment method securely via chat."
-  },
-  {
-    question: "Do you provide installation services?",
-    answer: "Currently, we do not provide in-house installation services. However, our products use standard plumbing fittings and come with all necessary mounting hardware. Any qualified local plumber can easily install them."
-  },
-  {
-    question: "What is your return policy?",
-    answer: "We offer a 7-day hassle-free return policy if the product you receive is damaged, defective, or not as described. The item must be unused and in its original packaging. Please contact our support team via WhatsApp to initiate a return."
-  }
-];
+import { api } from '../../lib/api';
 
 export default function FAQPage() {
   const [openIndex, setOpenIndex] = useState(0);
+  const [faqs, setFaqs] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  React.useEffect(() => {
+    async function fetchSettings() {
+      try {
+        const res = await api.getSettings();
+        if (res.data && res.data.faqs) {
+          setFaqs(res.data.faqs);
+        }
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchSettings();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50 text-slate-900 selection:bg-yellow-200">
@@ -46,7 +39,12 @@ export default function FAQPage() {
       </div>
 
       <section className="max-w-[800px] mx-auto px-4 lg:px-8 py-16">
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        {loading ? (
+          <div className="flex justify-center p-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-yellow-500"></div>
+          </div>
+        ) : (
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           {faqs.map((faq, index) => (
             <div 
               key={index} 
@@ -75,7 +73,11 @@ export default function FAQPage() {
               </div>
             </div>
           ))}
+          {faqs.length === 0 && (
+            <div className="p-8 text-center text-gray-500">No FAQs available at the moment.</div>
+          )}
         </div>
+        )}
 
         {/* Contact CTA */}
         <div className="mt-16 text-center">
