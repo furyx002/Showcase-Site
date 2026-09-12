@@ -16,19 +16,7 @@ export default function Home() {
   const { settings } = useSettings();
 
   const whatsappNumber = settings?.whatsappNumber || '+923006255511';
-
-  const heroSlides = [
-    {
-      image: settings?.heroSliderImage1 || 'https://images.unsplash.com/photo-1620626011761-996317b8d101?auto=format&fit=crop&q=80&w=2000',
-      title: 'LUXURY BATHROOM ESSENTIALS',
-      subtitle: 'Experience Unmatched Quality & Design'
-    },
-    {
-      image: settings?.heroSliderImage2 || 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&q=80&w=2000',
-      title: 'MODERN KITCHEN SOLUTIONS',
-      subtitle: 'Premium Sinks & Faucets Collection'
-    }
-  ];
+  const heroSliders = settings?.heroSliders?.length > 0 ? settings.heroSliders : ['/slider1.jpg', '/slider2.jpg'];
 
   useEffect(() => {
     loadProducts();
@@ -36,10 +24,10 @@ export default function Home() {
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev === 0 ? 1 : 0));
+      setCurrentSlide((prev) => (prev + 1) % heroSliders.length);
     }, 5000);
     return () => clearInterval(timer);
-  }, []);
+  }, [heroSliders.length]);
 
   const loadProducts = async () => {
     try {
@@ -84,11 +72,11 @@ export default function Home() {
           className="flex h-full w-full transition-transform duration-1000 ease-in-out"
           style={{ transform: `translateX(-${currentSlide * 100}%)` }}
         >
-          {[1, 2].map((num) => (
+          {heroSliders.map((imgUrl, idx) => (
             <img 
-              key={num}
-              src={`/slider${num}.jpg`} 
-              alt={`Slider ${num}`} 
+              key={idx}
+              src={imgUrl} 
+              alt={`Slider ${idx + 1}`} 
               className="w-full h-full object-cover flex-shrink-0"
             />
           ))}
@@ -96,13 +84,13 @@ export default function Home() {
         
         {/* Navigation Arrows */}
         <button 
-          onClick={() => setCurrentSlide(prev => (prev === 0 ? 1 : 0))}
+          onClick={() => setCurrentSlide(prev => (prev === 0 ? heroSliders.length - 1 : prev - 1))}
           className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white/80 hover:bg-white rounded-full flex items-center justify-center text-black opacity-0 group-hover:opacity-100 transition-opacity"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path></svg>
         </button>
         <button 
-          onClick={() => setCurrentSlide(prev => (prev === 1 ? 0 : 1))}
+          onClick={() => setCurrentSlide(prev => (prev === heroSliders.length - 1 ? 0 : prev + 1))}
           className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white/80 hover:bg-white rounded-full flex items-center justify-center text-black opacity-0 group-hover:opacity-100 transition-opacity"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path></svg>
@@ -110,7 +98,7 @@ export default function Home() {
 
         {/* Indicators */}
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex space-x-2">
-          {[0, 1].map((idx) => (
+          {heroSliders.map((_, idx) => (
             <div 
               key={idx}
               onClick={() => setCurrentSlide(idx)}

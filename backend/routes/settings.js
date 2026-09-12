@@ -5,8 +5,7 @@ const Setting = require('../models/Setting');
 // Default settings if not found in DB
 const DEFAULT_SETTINGS = {
   whatsappNumber: '+923006255511',
-  heroSliderImage1: 'https://images.unsplash.com/photo-1620626011761-996317b8d101?auto=format&fit=crop&q=80&w=2000',
-  heroSliderImage2: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&q=80&w=2000'
+  heroSliders: ['/slider1.jpg', '/slider2.jpg']
 };
 
 // GET /api/settings - Fetch all global settings

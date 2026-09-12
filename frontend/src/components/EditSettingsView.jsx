@@ -1,16 +1,22 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { api } from '../lib/api';
-import { Settings, Package, Plus, Edit3, Trash2, RefreshCw, X, Image as ImageIcon } from 'lucide-react';
+import { Settings, Package, FolderTree, Plus, Edit3, Trash2, RefreshCw, X, Image as ImageIcon, Search, LogOut, LayoutDashboard, Menu } from 'lucide-react';
 
-export default function EditSettingsView({ onRefreshAll }) {
-  const [activeTab, setActiveTab] = useState('products'); // 'products', 'settings', 'categories'
+export default function EditSettingsView({ onLogout }) {
+  const [activeTab, setActiveTab] = useState('products'); // 'dashboard', 'products', 'categories', 'settings'
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [settings, setSettings] = useState({ whatsappNumber: '', heroSliderImage1: '', heroSliderImage2: '' });
+  const [settings, setSettings] = useState({ whatsappNumber: '', heroSliders: [] });
+  
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState(null);
+
+  // Search state
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Form states
   const [editingProduct, setEditingProduct] = useState(null);
@@ -156,431 +162,551 @@ export default function EditSettingsView({ onRefreshAll }) {
     }
   };
 
+  const filteredProducts = useMemo(() => {
+    return products.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.category.toLowerCase().includes(searchQuery.toLowerCase()));
+  }, [products, searchQuery]);
+
+
+  // --- SUB-COMPONENTS ---
+  const NavItem = ({ id, icon: Icon, label }) => (
+    <button
+      onClick={() => { setActiveTab(id); setIsMobileMenuOpen(false); setEditingProduct(null); setEditingCategory(null); }}
+      className={`w-full flex items-center px-4 py-3 text-sm font-bold rounded-lg transition-colors tracking-wide ${
+        activeTab === id 
+          ? 'bg-yellow-500 text-slate-900' 
+          : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+      }`}
+    >
+      <Icon className="w-5 h-5 mr-3" />
+      {label}
+    </button>
+  );
+
   return (
-    <div className="space-y-6 animate-fadeIn pb-20">
+    <div className="flex h-screen bg-gray-50 overflow-hidden font-sans selection:bg-yellow-200">
       
-      {/* Top Header & Tabs */}
-      <div className="bg-white rounded-md shadow-sm border border-gray-200 overflow-hidden">
-        <div className="p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div>
-            <h2 className="text-2xl font-black text-black tracking-tight uppercase">Admin Dashboard</h2>
-            <p className="text-sm text-gray-500 font-medium mt-1 uppercase tracking-widest">Manage your store products and global settings</p>
-          </div>
-          <div className="flex items-center space-x-3">
-            {message && (
-              <span className="text-xs font-bold text-green-700 bg-green-50 border border-green-200 px-3 py-2 rounded-sm animate-fadeIn">
-                ✓ {message}
-              </span>
-            )}
-            <button
-              onClick={loadData}
-              className="p-3 bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 rounded-sm transition-colors"
-            >
-              <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
-            </button>
-          </div>
-        </div>
-        
-        {/* Navigation Tabs */}
-        <div className="flex border-t border-gray-100">
-          <button
-            onClick={() => setActiveTab('products')}
-            className={`flex-1 py-4 text-sm font-bold flex items-center justify-center space-x-2 transition-colors uppercase tracking-widest ${
-              activeTab === 'products' 
-                ? 'border-b-2 border-black text-black bg-gray-50' 
-                : 'text-gray-500 hover:bg-gray-50 border-b-2 border-transparent'
-            }`}
-          >
-            <Package className="w-4 h-4" />
-            <span>Product Catalog</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('categories')}
-            className={`flex-1 py-4 text-sm font-bold flex items-center justify-center space-x-2 transition-colors uppercase tracking-widest ${
-              activeTab === 'categories' 
-                ? 'border-b-2 border-black text-black bg-gray-50' 
-                : 'text-gray-500 hover:bg-gray-50 border-b-2 border-transparent'
-            }`}
-          >
-            <Package className="w-4 h-4" />
-            <span>Categories</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('settings')}
-            className={`flex-1 py-4 text-sm font-bold flex items-center justify-center space-x-2 transition-colors uppercase tracking-widest ${
-              activeTab === 'settings' 
-                ? 'border-b-2 border-black text-black bg-gray-50' 
-                : 'text-gray-500 hover:bg-gray-50 border-b-2 border-transparent'
-            }`}
-          >
-            <Settings className="w-4 h-4" />
-            <span>Store Settings</span>
-          </button>
-        </div>
-      </div>
-
-      {/* --- TAB CONTENT: SETTINGS --- */}
-      {activeTab === 'settings' && (
-        <div className="bg-white border border-gray-200 rounded-md p-6 md:p-8 animate-fadeIn shadow-sm">
-          <h3 className="text-lg font-black text-black mb-6 uppercase tracking-widest">Global Site Configuration</h3>
-          <form onSubmit={handleSaveSettings} className="space-y-6 max-w-2xl">
-            
-            {/* WhatsApp */}
-            <div>
-              <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">WhatsApp Contact Number</label>
-              <input
-                type="text"
-                required
-                value={settings.whatsappNumber || ''}
-                onChange={(e) => setSettings({ ...settings, whatsappNumber: e.target.value })}
-                className="w-full bg-gray-50 border border-gray-200 focus:border-black focus:ring-0 rounded-sm px-4 py-3 text-sm text-black font-semibold"
-                placeholder="+923001234567"
-              />
-            </div>
-
-            {/* Sliders */}
-            <div className="space-y-4">
-              <div className="p-4 rounded-sm border border-gray-200 bg-gray-50">
-                <div className="flex justify-between items-center mb-2">
-                  <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Hero Banner 1</label>
-                  <label className="cursor-pointer text-blue-600 font-bold text-xs hover:underline flex items-center space-x-1">
-                    <ImageIcon className="w-3 h-3" />
-                    <span>Upload Image</span>
-                    <input
-                      type="file"
-                      className="hidden"
-                      accept="image/*"
-                      onChange={(e) => handleImageUpload(e, (url) => setSettings({ ...settings, heroSliderImage1: url }))}
-                    />
-                  </label>
-                </div>
-                {settings.heroSliderImage1 && (
-                  <img src={settings.heroSliderImage1} alt="Hero 1" className="w-full h-32 object-cover rounded-sm mb-3 border border-gray-200" />
-                )}
-                <input
-                  type="text"
-                  value={settings.heroSliderImage1 || ''}
-                  onChange={(e) => setSettings({ ...settings, heroSliderImage1: e.target.value })}
-                  className="w-full bg-white border border-gray-200 rounded-sm px-3 py-2 text-xs focus:border-black"
-                  placeholder="Image URL"
-                />
-              </div>
-
-              <div className="p-4 rounded-sm border border-gray-200 bg-gray-50">
-                <div className="flex justify-between items-center mb-2">
-                  <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Hero Banner 2</label>
-                  <label className="cursor-pointer text-blue-600 font-bold text-xs hover:underline flex items-center space-x-1">
-                    <ImageIcon className="w-3 h-3" />
-                    <span>Upload Image</span>
-                    <input
-                      type="file"
-                      className="hidden"
-                      accept="image/*"
-                      onChange={(e) => handleImageUpload(e, (url) => setSettings({ ...settings, heroSliderImage2: url }))}
-                    />
-                  </label>
-                </div>
-                {settings.heroSliderImage2 && (
-                  <img src={settings.heroSliderImage2} alt="Hero 2" className="w-full h-32 object-cover rounded-sm mb-3 border border-gray-200" />
-                )}
-                <input
-                  type="text"
-                  value={settings.heroSliderImage2 || ''}
-                  onChange={(e) => setSettings({ ...settings, heroSliderImage2: e.target.value })}
-                  className="w-full bg-white border border-gray-200 rounded-sm px-3 py-2 text-xs focus:border-black"
-                  placeholder="Image URL"
-                />
-              </div>
-            </div>
-
-            <button type="submit" className="w-full py-4 bg-black hover:bg-gray-900 text-white font-black text-sm uppercase tracking-widest rounded-sm transition-colors">
-              Save Settings
-            </button>
-          </form>
-        </div>
+      {/* Mobile Sidebar Overlay */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={() => setIsMobileMenuOpen(false)} />
       )}
 
-      {/* --- TAB CONTENT: CATEGORIES --- */}
-      {activeTab === 'categories' && (
-        <div className="space-y-6 animate-fadeIn">
-          {!editingCategory && (
-            <button
-              onClick={() => {
-                setEditingCategory({ title: '', image: '' });
-                setCategoryForm({ title: '', image: '' });
-              }}
-              className="w-full border border-dashed border-gray-300 hover:border-black rounded-md p-8 flex flex-col items-center justify-center text-gray-400 hover:text-black transition-colors bg-white hover:bg-gray-50 shadow-sm"
-            >
-              <Plus className="w-8 h-8 mb-3" />
-              <span className="font-bold uppercase tracking-widest text-sm">Add New Category</span>
-            </button>
-          )}
+      {/* Sidebar */}
+      <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 text-white flex flex-col transition-transform duration-300 lg:translate-x-0 lg:static ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="h-20 flex items-center justify-between px-6 bg-slate-950 border-b border-slate-800">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-yellow-500 text-slate-900 flex items-center justify-center font-black text-lg rounded-sm">
+              SS
+            </div>
+            <span className="font-black tracking-widest text-sm uppercase">Admin Panel</span>
+          </div>
+          <button className="lg:hidden text-slate-400 hover:text-white" onClick={() => setIsMobileMenuOpen(false)}>
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+        
+        <nav className="flex-1 overflow-y-auto py-6 px-3 space-y-2">
+          <NavItem id="dashboard" icon={LayoutDashboard} label="Dashboard" />
+          <NavItem id="products" icon={Package} label="Products" />
+          <NavItem id="categories" icon={FolderTree} label="Categories" />
+          <NavItem id="settings" icon={Settings} label="Settings" />
+        </nav>
 
-          {editingCategory && (
-            <form onSubmit={handleSaveCategory} className="bg-white border border-gray-200 rounded-md p-6 md:p-8 shadow-sm space-y-6">
-              <div className="flex justify-between items-center border-b border-gray-100 pb-4">
-                <h3 className="text-lg font-black text-black uppercase tracking-widest">
-                  {editingCategory._id ? 'Edit Category' : 'Add New Category'}
-                </h3>
-                <button type="button" onClick={() => setEditingCategory(null)} className="p-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-sm transition-colors">
-                  <X className="w-4 h-4 text-gray-500" />
-                </button>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="space-y-5">
+        <div className="p-4 bg-slate-950 border-t border-slate-800">
+          <button onClick={onLogout} className="flex items-center w-full px-4 py-3 text-sm font-bold hover:text-white hover:bg-slate-800 rounded-lg transition-colors text-slate-400">
+            <LogOut className="w-5 h-5 mr-3" />
+            Sign Out
+          </button>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <main className="flex-1 flex flex-col h-screen overflow-hidden relative">
+        
+        {/* Header */}
+        <header className="h-20 bg-white border-b border-gray-200 flex items-center justify-between px-6 lg:px-10 shrink-0 shadow-sm z-10">
+          <div className="flex items-center">
+            <button className="lg:hidden mr-4 text-gray-500 hover:text-black" onClick={() => setIsMobileMenuOpen(true)}>
+              <Menu className="w-6 h-6" />
+            </button>
+            <h1 className="text-xl font-black text-gray-900 uppercase tracking-widest">
+              {activeTab === 'dashboard' && 'Dashboard Overview'}
+              {activeTab === 'products' && (editingProduct ? (editingProduct._id ? 'Edit Product' : 'Add New Product') : 'Products Catalog')}
+              {activeTab === 'categories' && (editingCategory ? (editingCategory._id ? 'Edit Category' : 'Add New Category') : 'Category Management')}
+              {activeTab === 'settings' && 'Global Settings'}
+            </h1>
+          </div>
+
+          <div className="flex items-center space-x-4">
+            {message && (
+              <span className="hidden sm:flex text-xs font-bold text-green-700 bg-green-50 border border-green-200 px-3 py-1.5 rounded-full animate-fadeIn items-center gap-1">
+                <span className="w-2 h-2 rounded-full bg-green-500"></span> {message}
+              </span>
+            )}
+            
+            {(activeTab === 'products' && !editingProduct) && (
+              <button
+                onClick={() => {
+                  setEditingProduct({ name: '', category: categories[0]?.title || 'Wash Basins', price: '', stock: 100, images: [] });
+                  setProductForm({ name: '', category: categories[0]?.title || 'Wash Basins', price: '', stock: 100, images: [] });
+                }}
+                className="bg-black hover:bg-gray-800 text-white font-bold py-2 px-4 rounded-md text-sm flex items-center gap-2 transition-colors"
+              >
+                <Plus className="w-4 h-4" /> <span className="hidden sm:inline">Add Product</span>
+              </button>
+            )}
+
+            {(activeTab === 'categories' && !editingCategory) && (
+              <button
+                onClick={() => {
+                  setEditingCategory({ title: '', image: '' });
+                  setCategoryForm({ title: '', image: '' });
+                }}
+                className="bg-black hover:bg-gray-800 text-white font-bold py-2 px-4 rounded-md text-sm flex items-center gap-2 transition-colors"
+              >
+                <Plus className="w-4 h-4" /> <span className="hidden sm:inline">Add Category</span>
+              </button>
+            )}
+
+            <button
+              onClick={loadData}
+              className="p-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-600 rounded-md transition-colors"
+              title="Refresh Data"
+            >
+              <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin text-yellow-600' : ''}`} />
+            </button>
+          </div>
+        </header>
+
+        {/* Content Scroll Area */}
+        <div className="flex-1 overflow-auto p-6 lg:p-10">
+          
+          {/* DASHBOARD TAB */}
+          {activeTab === 'dashboard' && (
+            <div className="max-w-6xl mx-auto space-y-6 animate-fadeIn">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-center space-x-4">
+                  <div className="w-14 h-14 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center">
+                    <Package className="w-7 h-7" />
+                  </div>
                   <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5">Category Name</label>
-                    <input type="text" required value={categoryForm.title} onChange={(e) => setCategoryForm({ ...categoryForm, title: e.target.value })} className="w-full bg-gray-50 border border-gray-200 focus:border-black rounded-sm px-4 py-2.5 text-sm font-semibold" />
+                    <p className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-1">Total Products</p>
+                    <h3 className="text-3xl font-black text-gray-900">{products.length}</h3>
                   </div>
                 </div>
-
-                <div className="bg-gray-50 p-5 rounded-sm border border-gray-200">
-                  <div className="flex justify-between items-center mb-5">
-                    <div>
-                      <label className="block text-xs font-bold text-black uppercase tracking-widest">Category Image</label>
-                    </div>
-                    <label className="cursor-pointer bg-white border border-gray-300 hover:border-black text-black px-3 py-1.5 rounded-sm text-xs font-bold uppercase tracking-wider flex items-center space-x-1 transition-colors">
-                      <Plus className="w-3 h-3" />
-                      <span>Upload</span>
-                      <input
-                        type="file"
-                        className="hidden"
-                        accept="image/*"
-                        onChange={(e) => handleImageUpload(e, (url) => setCategoryForm({ ...categoryForm, image: url }))}
-                      />
-                    </label>
+                <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-center space-x-4">
+                  <div className="w-14 h-14 bg-purple-50 text-purple-600 rounded-full flex items-center justify-center">
+                    <FolderTree className="w-7 h-7" />
                   </div>
-                  
-                  {!categoryForm.image ? (
-                    <div className="text-center py-8 text-gray-400 text-xs uppercase tracking-widest border border-dashed border-gray-300 bg-white rounded-sm">
-                      No image uploaded yet.
+                  <div>
+                    <p className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-1">Categories</p>
+                    <h3 className="text-3xl font-black text-gray-900">{categories.length}</h3>
+                  </div>
+                </div>
+                <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-center space-x-4">
+                  <div className="w-14 h-14 bg-green-50 text-green-600 rounded-full flex items-center justify-center">
+                    <LayoutDashboard className="w-7 h-7" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-1">System Status</p>
+                    <h3 className="text-xl font-black text-gray-900">Online</h3>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* PRODUCTS TAB */}
+          {activeTab === 'products' && (
+            <div className="max-w-6xl mx-auto animate-fadeIn">
+              {editingProduct ? (
+                // PRODUCT FORM
+                <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+                  <div className="bg-gray-50 px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                    <h3 className="font-bold text-gray-700 uppercase tracking-widest text-sm">Product Details</h3>
+                    <button type="button" onClick={() => setEditingProduct(null)} className="text-gray-400 hover:text-black">
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+                  <form onSubmit={handleSaveProduct} className="p-6 md:p-8 space-y-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                      
+                      {/* Left: Text Info */}
+                      <div className="space-y-6">
+                        <div>
+                          <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Product Name</label>
+                          <input type="text" required value={productForm.name} onChange={(e) => setProductForm({ ...productForm, name: e.target.value })} className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-black rounded-lg px-4 py-3 text-sm font-semibold outline-none transition-colors" placeholder="e.g. Modern Brass Faucet" />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Category</label>
+                          <select 
+                            required
+                            value={productForm.category} 
+                            onChange={(e) => setProductForm({ ...productForm, category: e.target.value })} 
+                            className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-black rounded-lg px-4 py-3 text-sm font-semibold outline-none transition-colors appearance-none cursor-pointer"
+                          >
+                            <option value="" disabled>Select a category</option>
+                            {categories.map(c => (
+                              <option key={c._id} value={c.title.replace(/\n/g, ' ')}>{c.title.replace(/\n/g, ' ')}</option>
+                            ))}
+                          </select>
+                        </div>
+                        <div className="grid grid-cols-2 gap-6">
+                          <div>
+                            <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Price (PKR)</label>
+                            <input type="number" required value={productForm.price} onChange={(e) => setProductForm({ ...productForm, price: e.target.value })} className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-black rounded-lg px-4 py-3 text-sm font-mono font-bold outline-none transition-colors" placeholder="0.00" />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Stock Level</label>
+                            <input type="number" value={productForm.stock} onChange={(e) => setProductForm({ ...productForm, stock: e.target.value })} className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-black rounded-lg px-4 py-3 text-sm font-mono font-bold outline-none transition-colors" placeholder="100" />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Right: Images */}
+                      <div>
+                        <div className="flex justify-between items-center mb-4">
+                          <div>
+                            <label className="block text-xs font-bold text-black uppercase tracking-widest">Product Images</label>
+                            <p className="text-[10px] text-gray-500 mt-1">Upload up to 3 images (Primary, Hover, Gallery)</p>
+                          </div>
+                          <label className="cursor-pointer bg-white border border-gray-200 hover:border-black text-black px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center space-x-2 transition-colors">
+                            <ImageIcon className="w-4 h-4" />
+                            <span>Upload Image</span>
+                            <input type="file" className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, (url) => setProductForm({ ...productForm, images: [...productForm.images, url] }))} />
+                          </label>
+                        </div>
+                        
+                        {productForm.images.length === 0 ? (
+                          <div className="w-full h-48 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50 flex flex-col items-center justify-center text-gray-400">
+                            <ImageIcon className="w-8 h-8 mb-2 opacity-50" />
+                            <span className="text-xs uppercase tracking-widest font-semibold">No images uploaded</span>
+                          </div>
+                        ) : (
+                          <div className="grid grid-cols-2 gap-4">
+                            {productForm.images.map((imgUrl, idx) => (
+                              <div key={idx} className="relative group rounded-xl overflow-hidden border border-gray-200 bg-white aspect-square flex items-center justify-center">
+                                <img src={imgUrl} alt={`Product ${idx}`} className="w-full h-full object-contain p-2" />
+                                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                                  <button type="button" onClick={() => removeImage(idx)} className="p-3 bg-red-500 text-white rounded-full hover:bg-red-600 transition-transform hover:scale-110 shadow-lg">
+                                    <Trash2 className="w-5 h-5" />
+                                  </button>
+                                </div>
+                                <span className="absolute top-2 left-2 bg-black/80 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider shadow">
+                                  {idx === 0 ? 'Primary' : idx === 1 ? 'Hover' : 'Gallery'}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  ) : (
-                    <div className="relative group rounded-sm overflow-hidden border border-gray-200 bg-white aspect-video flex items-center justify-center p-2">
-                      <img src={categoryForm.image} alt="Category" className="w-full h-full object-cover" />
-                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                        <button type="button" onClick={() => setCategoryForm({ ...categoryForm, image: '' })} className="p-2 bg-red-500 text-white rounded-sm hover:bg-red-600 transition-colors">
+
+                    <div className="flex justify-end space-x-4 pt-8 border-t border-gray-100 mt-8">
+                      <button type="button" onClick={() => setEditingProduct(null)} className="px-6 py-3 text-gray-600 font-bold text-xs uppercase tracking-widest hover:bg-gray-100 rounded-lg transition-colors">
+                        Cancel
+                      </button>
+                      <button type="submit" className="px-8 py-3 bg-black hover:bg-slate-800 text-white font-black text-xs uppercase tracking-widest rounded-lg transition-colors shadow-md">
+                        {editingProduct._id ? 'Save Changes' : 'Publish Product'}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              ) : (
+                // PRODUCT LIST (DATA TABLE)
+                <div className="space-y-6">
+                  {/* Search Bar */}
+                  <div className="relative max-w-md">
+                    <input 
+                      type="text" 
+                      placeholder="Search products by name or category..." 
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 focus:border-black focus:ring-0 rounded-lg text-sm shadow-sm outline-none transition-colors"
+                    />
+                    <Search className="w-5 h-5 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2" />
+                  </div>
+
+                  <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left text-sm">
+                        <thead className="bg-gray-50 border-b border-gray-200 text-xs uppercase tracking-widest text-gray-500 font-bold">
+                          <tr>
+                            <th className="px-6 py-4">Product</th>
+                            <th className="px-6 py-4">Category</th>
+                            <th className="px-6 py-4">Price</th>
+                            <th className="px-6 py-4">Stock</th>
+                            <th className="px-6 py-4 text-right">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-100">
+                          {filteredProducts.length === 0 ? (
+                            <tr>
+                              <td colSpan="5" className="px-6 py-12 text-center text-gray-400 font-medium">No products found.</td>
+                            </tr>
+                          ) : (
+                            filteredProducts.map(p => (
+                              <tr key={p._id} className="hover:bg-gray-50 transition-colors group">
+                                <td className="px-6 py-4 flex items-center space-x-4">
+                                  <div className="w-12 h-12 rounded-lg bg-gray-100 border border-gray-200 flex items-center justify-center overflow-hidden shrink-0">
+                                    {(p.images && p.images.length > 0) ? (
+                                      <img src={p.images[0]} alt="" className="w-10 h-10 object-contain mix-blend-multiply" />
+                                    ) : (p.image ? (
+                                      <img src={p.image} alt="" className="w-10 h-10 object-contain mix-blend-multiply" />
+                                    ) : (
+                                      <ImageIcon className="w-5 h-5 text-gray-300" />
+                                    ))}
+                                  </div>
+                                  <span className="font-bold text-gray-900">{p.name}</span>
+                                </td>
+                                <td className="px-6 py-4 text-gray-600 font-medium">
+                                  <span className="bg-gray-100 text-gray-600 px-2.5 py-1 rounded-md text-[11px] font-bold uppercase tracking-wider">{p.category}</span>
+                                </td>
+                                <td className="px-6 py-4 font-mono font-bold text-gray-900">
+                                  Rs.{p.price.toLocaleString()}
+                                </td>
+                                <td className="px-6 py-4">
+                                  <span className={`font-mono font-bold ${p.stock > 10 ? 'text-green-600' : 'text-red-600'}`}>{p.stock || 100}</span>
+                                </td>
+                                <td className="px-6 py-4 text-right">
+                                  <div className="flex items-center justify-end space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button
+                                      onClick={() => {
+                                        setEditingProduct(p);
+                                        const imagesArr = p.images && p.images.length > 0 ? p.images : (p.image ? [p.image] : []);
+                                        setProductForm({ name: p.name, category: p.category, price: p.price, stock: p.stock || 100, images: imagesArr });
+                                      }}
+                                      className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                      title="Edit Product"
+                                    >
+                                      <Edit3 className="w-4 h-4" />
+                                    </button>
+                                    <button
+                                      onClick={() => handleDeleteProduct(p._id)}
+                                      className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                      title="Delete Product"
+                                    >
+                                      <Trash2 className="w-4 h-4" />
+                                    </button>
+                                  </div>
+                                </td>
+                              </tr>
+                            ))
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* CATEGORIES TAB */}
+          {activeTab === 'categories' && (
+            <div className="max-w-6xl mx-auto animate-fadeIn">
+              {editingCategory ? (
+                 <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden mb-8">
+                 <div className="bg-gray-50 px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                   <h3 className="font-bold text-gray-700 uppercase tracking-widest text-sm">Category Details</h3>
+                   <button type="button" onClick={() => setEditingCategory(null)} className="text-gray-400 hover:text-black">
+                     <X className="w-5 h-5" />
+                   </button>
+                 </div>
+                 <form onSubmit={handleSaveCategory} className="p-6 md:p-8 space-y-8">
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                     <div className="space-y-6">
+                       <div>
+                         <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Category Name (Supports Line Breaks)</label>
+                         <textarea required value={categoryForm.title} onChange={(e) => setCategoryForm({ ...categoryForm, title: e.target.value })} className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-black rounded-lg px-4 py-3 text-sm font-semibold outline-none transition-colors" rows="3" placeholder="e.g. FAUCETS & \nMIXERS"></textarea>
+                       </div>
+                     </div>
+ 
+                     <div>
+                       <div className="flex justify-between items-center mb-4">
+                         <label className="block text-xs font-bold text-black uppercase tracking-widest">Category Banner Image</label>
+                         <label className="cursor-pointer bg-white border border-gray-200 hover:border-black text-black px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center space-x-2 transition-colors">
+                           <ImageIcon className="w-4 h-4" />
+                           <span>Upload</span>
+                           <input type="file" className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, (url) => setCategoryForm({ ...categoryForm, image: url }))} />
+                         </label>
+                       </div>
+                       
+                       {!categoryForm.image ? (
+                         <div className="w-full h-40 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50 flex flex-col items-center justify-center text-gray-400">
+                           <ImageIcon className="w-8 h-8 mb-2 opacity-50" />
+                           <span className="text-xs uppercase tracking-widest font-semibold">No image uploaded</span>
+                         </div>
+                       ) : (
+                         <div className="relative group rounded-xl overflow-hidden border border-gray-200 bg-white aspect-video flex items-center justify-center p-1">
+                           <img src={categoryForm.image} alt="Category" className="w-full h-full object-cover rounded-lg" />
+                           <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity rounded-lg m-1">
+                             <button type="button" onClick={() => setCategoryForm({ ...categoryForm, image: '' })} className="p-3 bg-red-500 text-white rounded-full hover:bg-red-600 transition-transform hover:scale-110 shadow-lg">
+                               <Trash2 className="w-5 h-5" />
+                             </button>
+                           </div>
+                         </div>
+                       )}
+                     </div>
+                   </div>
+ 
+                   <div className="flex justify-end space-x-4 pt-8 border-t border-gray-100 mt-8">
+                     <button type="button" onClick={() => setEditingCategory(null)} className="px-6 py-3 text-gray-600 font-bold text-xs uppercase tracking-widest hover:bg-gray-100 rounded-lg transition-colors">
+                       Cancel
+                     </button>
+                     <button type="submit" className="px-8 py-3 bg-black hover:bg-slate-800 text-white font-black text-xs uppercase tracking-widest rounded-lg transition-colors shadow-md">
+                       {editingCategory._id ? 'Save Changes' : 'Create Category'}
+                     </button>
+                   </div>
+                 </form>
+               </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {categories.map(c => (
+                    <div key={c._id} className="bg-white border border-gray-200 rounded-xl shadow-sm flex flex-col group overflow-hidden">
+                      <div className="h-40 bg-slate-900 relative flex items-center justify-center group/img overflow-hidden">
+                        {c.image ? (
+                          <img src={c.image} alt="" className="w-full h-full object-cover opacity-50 group-hover/img:scale-110 transition-transform duration-700 grayscale group-hover/img:grayscale-0" />
+                        ) : (
+                          <FolderTree className="w-12 h-12 text-slate-700" />
+                        )}
+                        <h3 className="absolute inset-0 flex items-center justify-center text-xl font-black text-white text-center whitespace-pre-line p-4 drop-shadow-md pointer-events-none">
+                          {c.title}
+                        </h3>
+                      </div>
+                      
+                      <div className="p-4 bg-white flex justify-end space-x-2">
+                        <button
+                          onClick={() => {
+                            setEditingCategory(c);
+                            setCategoryForm({ title: c.title, image: c.image || '' });
+                          }}
+                          className="flex-1 flex items-center justify-center gap-2 py-2 bg-gray-50 border border-gray-200 hover:bg-gray-100 hover:border-gray-300 text-gray-700 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors"
+                        >
+                          <Edit3 className="w-3.5 h-3.5" /> Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeleteCategory(c._id)}
+                          className="px-4 py-2 bg-red-50 border border-red-100 hover:bg-red-100 hover:border-red-200 text-red-600 rounded-lg transition-colors"
+                        >
                           <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
                     </div>
-                  )}
+                  ))}
                 </div>
-              </div>
-
-              <div className="flex justify-end space-x-3 pt-6 border-t border-gray-100">
-                <button type="button" onClick={() => setEditingCategory(null)} className="px-6 py-3 text-gray-500 border border-gray-200 font-bold text-xs uppercase tracking-widest hover:bg-gray-50 rounded-sm transition-colors">
-                  Cancel
-                </button>
-                <button type="submit" className="px-8 py-3 bg-black hover:bg-gray-900 text-white font-black text-xs uppercase tracking-widest rounded-sm transition-colors shadow-sm">
-                  {editingCategory._id ? 'Update Category' : 'Create Category'}
-                </button>
-              </div>
-            </form>
+              )}
+            </div>
           )}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {categories.map(c => (
-              <div key={c._id} className="bg-white border border-gray-200 rounded-md shadow-sm flex flex-col group overflow-hidden">
-                <div className="h-40 bg-black relative flex items-center justify-center group/img">
-                  {c.image ? (
-                    <img src={c.image} alt={c.title} className="w-full h-full object-cover opacity-50 group-hover/img:scale-110 transition-transform duration-700 grayscale group-hover/img:grayscale-0" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-500 font-bold uppercase tracking-widest text-xs">No Image</div>
-                  )}
-                  <h3 className="absolute inset-0 flex items-center justify-center text-2xl font-black text-white text-center whitespace-pre-line p-4 drop-shadow-md pointer-events-none">
-                    {c.title}
-                  </h3>
-                </div>
+          {/* SETTINGS TAB */}
+          {activeTab === 'settings' && (
+            <div className="max-w-3xl mx-auto bg-white border border-gray-200 rounded-xl p-8 shadow-sm animate-fadeIn">
+              <form onSubmit={handleSaveSettings} className="space-y-8">
                 
-                <div className="p-3 bg-gray-50 flex justify-end space-x-1 border-t border-gray-100">
-                  <button
-                    onClick={() => {
-                      setEditingCategory(c);
-                      setCategoryForm({ title: c.title, image: c.image || '' });
-                    }}
-                    className="p-2 bg-white border border-gray-200 hover:bg-gray-100 hover:border-gray-300 text-gray-600 rounded-sm transition-colors"
-                  >
-                    <Edit3 className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => handleDeleteCategory(c._id)}
-                    className="p-2 bg-red-50 border border-red-100 hover:bg-red-100 hover:border-red-200 text-red-600 rounded-sm transition-colors"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* --- TAB CONTENT: PRODUCTS --- */}
-      {activeTab === 'products' && (
-        <div className="space-y-6 animate-fadeIn">
-          
-          {/* Add Product Button */}
-          {!editingProduct && (
-            <button
-              onClick={() => {
-                setEditingProduct({ name: '', category: 'Wash Basins', price: '', stock: 100, images: [] });
-                setProductForm({ name: '', category: 'Wash Basins', price: '', stock: 100, images: [] });
-              }}
-              className="w-full border border-dashed border-gray-300 hover:border-black rounded-md p-8 flex flex-col items-center justify-center text-gray-400 hover:text-black transition-colors bg-white hover:bg-gray-50 shadow-sm"
-            >
-              <Plus className="w-8 h-8 mb-3" />
-              <span className="font-bold uppercase tracking-widest text-sm">Add New Product</span>
-            </button>
-          )}
-
-          {/* Add/Edit Form */}
-          {editingProduct && (
-            <form onSubmit={handleSaveProduct} className="bg-white border border-gray-200 rounded-md p-6 md:p-8 shadow-sm space-y-6">
-              <div className="flex justify-between items-center border-b border-gray-100 pb-4">
-                <h3 className="text-lg font-black text-black uppercase tracking-widest">
-                  {editingProduct._id ? 'Edit Product' : 'Add New Product'}
-                </h3>
-                <button type="button" onClick={() => setEditingProduct(null)} className="p-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-sm transition-colors">
-                  <X className="w-4 h-4 text-gray-500" />
-                </button>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="space-y-5">
+                {/* Contact Info */}
+                <section>
+                  <h3 className="text-sm font-black text-black mb-4 uppercase tracking-widest border-b border-gray-100 pb-2">Contact Information</h3>
                   <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5">Product Name</label>
-                    <input type="text" required value={productForm.name} onChange={(e) => setProductForm({ ...productForm, name: e.target.value })} className="w-full bg-gray-50 border border-gray-200 focus:border-black rounded-sm px-4 py-2.5 text-sm font-semibold" />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5">Category</label>
-                    <input 
-                      list="category-options"
+                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">WhatsApp Ordering Number</label>
+                    <input
+                      type="text"
                       required
-                      value={productForm.category} 
-                      onChange={(e) => setProductForm({ ...productForm, category: e.target.value })} 
-                      className="w-full bg-gray-50 border border-gray-200 focus:border-black rounded-sm px-4 py-2.5 text-sm font-semibold"
-                      placeholder="e.g. Wash Basins"
+                      value={settings.whatsappNumber || ''}
+                      onChange={(e) => setSettings({ ...settings, whatsappNumber: e.target.value })}
+                      className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-black rounded-lg px-4 py-3 text-sm text-black font-semibold outline-none transition-colors"
+                      placeholder="e.g. +923001234567"
                     />
-                    <datalist id="category-options">
-                      {categories.map(c => (
-                        <option key={c._id} value={c.title.replace(/\n/g, ' ')} />
-                      ))}
-                    </datalist>
+                    <p className="text-[11px] text-gray-400 mt-2">This number is used for all "Buy on WhatsApp" buttons.</p>
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5">Price (PKR)</label>
-                      <input type="number" required value={productForm.price} onChange={(e) => setProductForm({ ...productForm, price: e.target.value })} className="w-full bg-gray-50 border border-gray-200 focus:border-black rounded-sm px-4 py-2.5 text-sm font-mono font-bold" />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5">Stock</label>
-                      <input type="number" value={productForm.stock} onChange={(e) => setProductForm({ ...productForm, stock: e.target.value })} className="w-full bg-gray-50 border border-gray-200 focus:border-black rounded-sm px-4 py-2.5 text-sm font-mono font-bold" />
-                    </div>
-                  </div>
-                </div>
+                </section>
 
-                {/* Multiple Images Upload UI */}
-                <div className="bg-gray-50 p-5 rounded-sm border border-gray-200">
-                  <div className="flex justify-between items-center mb-5">
-                    <div>
-                      <label className="block text-xs font-bold text-black uppercase tracking-widest">Product Images</label>
-                      <p className="text-[10px] text-gray-500 uppercase tracking-wider mt-0.5">Primary (Left) | Hover (Middle) | Gallery (Right)</p>
-                    </div>
-                    <label className="cursor-pointer bg-white border border-gray-300 hover:border-black text-black px-3 py-1.5 rounded-sm text-xs font-bold uppercase tracking-wider flex items-center space-x-1 transition-colors">
-                      <Plus className="w-3 h-3" />
-                      <span>Upload</span>
-                      <input
-                        type="file"
-                        className="hidden"
-                        accept="image/*"
-                        onChange={(e) => handleImageUpload(e, (url) => setProductForm({ ...productForm, images: [...productForm.images, url] }))}
-                      />
-                    </label>
+                {/* Sliders */}
+                <section>
+                  <div className="flex justify-between items-end mb-4 border-b border-gray-100 pb-2">
+                    <h3 className="text-sm font-black text-black uppercase tracking-widest">Homepage Sliders</h3>
+                    <button 
+                      type="button" 
+                      onClick={() => setSettings(s => ({ ...s, heroSliders: [...(s.heroSliders || []), ''] }))}
+                      className="bg-black hover:bg-gray-800 text-white font-bold py-1.5 px-3 rounded-md text-xs flex items-center gap-1 transition-colors"
+                    >
+                      <Plus className="w-3 h-3" /> Add Banner
+                    </button>
                   </div>
                   
-                  {productForm.images.length === 0 ? (
-                    <div className="text-center py-8 text-gray-400 text-xs uppercase tracking-widest border border-dashed border-gray-300 bg-white rounded-sm">
-                      No images uploaded yet.
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                      {productForm.images.map((imgUrl, idx) => (
-                        <div key={idx} className="relative group rounded-sm overflow-hidden border border-gray-200 bg-white aspect-square flex items-center justify-center p-2">
-                          <img src={imgUrl} alt={`Product ${idx}`} className="w-full h-full object-contain" />
-                          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                            <button type="button" onClick={() => removeImage(idx)} className="p-2 bg-red-500 text-white rounded-sm hover:bg-red-600 transition-colors">
-                              <Trash2 className="w-4 h-4" />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {(settings.heroSliders || []).map((sliderUrl, idx) => (
+                      <div key={idx} className="p-5 rounded-xl border border-gray-200 bg-gray-50 relative group">
+                        <div className="flex justify-between items-center mb-3">
+                          <label className="text-xs font-bold text-gray-700 uppercase tracking-widest">Banner {idx + 1}</label>
+                          <div className="flex space-x-3">
+                            <label className="cursor-pointer text-blue-600 font-bold text-xs hover:underline flex items-center space-x-1">
+                              <ImageIcon className="w-3 h-3" />
+                              <span>Upload</span>
+                              <input 
+                                type="file" 
+                                className="hidden" 
+                                accept="image/*" 
+                                onChange={(e) => handleImageUpload(e, (url) => {
+                                  const newSliders = [...(settings.heroSliders || [])];
+                                  newSliders[idx] = url;
+                                  setSettings({ ...settings, heroSliders: newSliders });
+                                })} 
+                              />
+                            </label>
+                            <button 
+                              type="button"
+                              onClick={() => {
+                                const newSliders = [...(settings.heroSliders || [])];
+                                newSliders.splice(idx, 1);
+                                setSettings({ ...settings, heroSliders: newSliders });
+                              }}
+                              className="text-red-500 hover:text-red-700 font-bold text-xs"
+                            >
+                              Remove
                             </button>
                           </div>
-                          {idx === 0 && <span className="absolute top-1 left-1 bg-black text-white text-[9px] font-bold px-1.5 py-0.5 uppercase tracking-wider shadow">Primary</span>}
-                          {idx === 1 && <span className="absolute top-1 left-1 bg-gray-500 text-white text-[9px] font-bold px-1.5 py-0.5 uppercase tracking-wider shadow">Hover</span>}
                         </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
+                        {sliderUrl ? (
+                          <img src={sliderUrl} alt={`Hero ${idx + 1}`} className="w-full h-32 object-cover rounded-lg mb-3 border border-gray-200 bg-white" />
+                        ) : (
+                          <div className="w-full h-32 bg-gray-200 rounded-lg mb-3 flex flex-col items-center justify-center text-gray-400">
+                            <ImageIcon className="w-6 h-6 mb-1 opacity-50" />
+                            <span className="text-[10px] uppercase font-bold tracking-widest">Empty</span>
+                          </div>
+                        )}
+                        <input 
+                          type="text" 
+                          value={sliderUrl || ''} 
+                          onChange={(e) => {
+                            const newSliders = [...(settings.heroSliders || [])];
+                            newSliders[idx] = e.target.value;
+                            setSettings({ ...settings, heroSliders: newSliders });
+                          }} 
+                          className="w-full bg-white border border-gray-200 rounded-md px-3 py-2 text-xs focus:border-black outline-none" 
+                          placeholder="Or enter Image URL" 
+                        />
+                      </div>
+                    ))}
+                    
+                    {(!settings.heroSliders || settings.heroSliders.length === 0) && (
+                      <div className="col-span-1 md:col-span-2 text-center py-8 text-gray-400 text-xs uppercase tracking-widest border border-dashed border-gray-300 bg-white rounded-xl">
+                        No banners configured. Add a banner above.
+                      </div>
+                    )}
+                  </div>
+                </section>
 
-              <div className="flex justify-end space-x-3 pt-6 border-t border-gray-100">
-                <button type="button" onClick={() => setEditingProduct(null)} className="px-6 py-3 text-gray-500 border border-gray-200 font-bold text-xs uppercase tracking-widest hover:bg-gray-50 rounded-sm transition-colors">
-                  Cancel
-                </button>
-                <button type="submit" className="px-8 py-3 bg-black hover:bg-gray-900 text-white font-black text-xs uppercase tracking-widest rounded-sm transition-colors shadow-sm">
-                  {editingProduct._id ? 'Update Product' : 'Create Product'}
-                </button>
-              </div>
-            </form>
+                <div className="pt-4">
+                  <button type="submit" className="w-full py-4 bg-black hover:bg-slate-800 text-white font-black text-sm uppercase tracking-widest rounded-lg transition-colors shadow-md">
+                    Save Global Settings
+                  </button>
+                </div>
+              </form>
+            </div>
           )}
 
-          {/* Product Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {products.map(p => (
-              <div key={p._id} className="bg-white border border-gray-200 rounded-md shadow-sm flex flex-col group overflow-hidden">
-                <div className="h-48 bg-gray-50 relative p-4 flex items-center justify-center border-b border-gray-100 group/img">
-                  {(p.images && p.images.length > 0) ? (
-                    <img src={p.images[0]} alt={p.name} className="w-full h-full object-contain mix-blend-multiply transition-transform duration-700 group-hover/img:scale-110" />
-                  ) : (p.image ? (
-                    <img src={p.image} alt={p.name} className="w-full h-full object-contain mix-blend-multiply transition-transform duration-700 group-hover/img:scale-110" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-300 font-bold uppercase tracking-widest text-xs">No Image</div>
-                  ))}
-                  <div className="absolute top-3 left-3 bg-white border border-gray-200 text-[9px] font-black px-2.5 py-1 text-black uppercase tracking-widest shadow-sm">
-                    {p.category}
-                  </div>
-                </div>
-                
-                <div className="p-5 flex-1 flex flex-col">
-                  <h4 className="font-bold text-sm text-black leading-snug mb-3 uppercase tracking-wide group-hover:text-blue-600 transition-colors">{p.name}</h4>
-                  <div className="mt-auto flex justify-between items-end">
-                    <span className="text-black font-black font-mono text-sm">Rs.{p.price.toLocaleString()}</span>
-                    <div className="flex space-x-1">
-                      <button
-                        onClick={() => {
-                          setEditingProduct(p);
-                          // Backwards compatibility for single image
-                          const imagesArr = p.images && p.images.length > 0 ? p.images : (p.image ? [p.image] : []);
-                          setProductForm({ name: p.name, category: p.category, price: p.price, stock: p.stock || 100, images: imagesArr });
-                        }}
-                        className="p-2 bg-gray-50 border border-gray-200 hover:bg-gray-100 hover:border-gray-300 text-gray-600 rounded-sm transition-colors"
-                      >
-                        <Edit3 className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteProduct(p._id)}
-                        className="p-2 bg-red-50 border border-red-100 hover:bg-red-100 hover:border-red-200 text-red-600 rounded-sm transition-colors"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
-      )}
+      </main>
     </div>
   );
 }

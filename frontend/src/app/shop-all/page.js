@@ -20,6 +20,15 @@ function ShopAllContent() {
     loadProducts();
   }, []);
 
+  useEffect(() => {
+    const queryCategory = searchParams.get('category');
+    if (queryCategory) {
+      setCategoryFilter(queryCategory);
+    } else {
+      setCategoryFilter('ALL');
+    }
+  }, [searchParams]);
+
   const loadProducts = async () => {
     try {
       const res = await api.getProducts();
