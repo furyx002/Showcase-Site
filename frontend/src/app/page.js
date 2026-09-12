@@ -67,9 +67,9 @@ export default function Home() {
       {/* Header moved to layout.js */}
 
       {/* Hero Image Slider */}
-      <section className="relative w-full h-[300px] sm:h-[400px] lg:h-[600px] bg-black overflow-hidden group">
+      <section className="relative w-full bg-black overflow-hidden group">
         <div 
-          className="flex h-full w-full transition-transform duration-1000 ease-in-out"
+          className="flex w-full items-center transition-transform duration-1000 ease-in-out"
           style={{ transform: `translateX(-${currentSlide * 100}%)` }}
         >
           {heroSliders.map((imgUrl, idx) => (
@@ -77,7 +77,7 @@ export default function Home() {
               key={idx}
               src={imgUrl} 
               alt={`Slider ${idx + 1}`} 
-              className="w-full h-full object-cover flex-shrink-0"
+              className="w-full h-auto object-contain flex-shrink-0"
             />
           ))}
         </div>
