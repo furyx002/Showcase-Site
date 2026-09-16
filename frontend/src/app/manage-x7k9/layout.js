@@ -73,11 +73,16 @@ export default function AdminLayout({ children }) {
       {/* Sidebar */}
       <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 text-white flex flex-col transition-transform duration-300 lg:translate-x-0 lg:static ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="h-20 flex items-center justify-between px-6 bg-slate-950 border-b border-slate-800">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-yellow-500 text-slate-900 flex items-center justify-center font-black text-lg rounded-sm">
-              SS
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 bg-yellow-500 text-slate-900 flex items-center justify-center font-black text-xs rounded-md shadow-sm">
+              HS
             </div>
-            <span className="font-black tracking-widest text-sm uppercase">Admin Panel</span>
+            <div className="flex flex-col">
+              <span className="font-black tracking-wider text-xs uppercase text-white truncate max-w-[130px]">
+                {user?.name || 'Huzaifa Shah'}
+              </span>
+              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Admin Panel</span>
+            </div>
           </div>
           <button className="lg:hidden text-slate-400 hover:text-white" onClick={() => setIsMobileMenuOpen(false)}>
             <X className="w-5 h-5" />
@@ -107,10 +112,13 @@ export default function AdminLayout({ children }) {
           })}
         </nav>
 
-        <div className="p-4 border-t border-slate-800 bg-slate-950/50">
+        <div className="p-4 border-t border-slate-800 bg-slate-950/50 space-y-2">
+          <div className="px-4 py-1 text-xs text-slate-400 font-medium truncate">
+            Logged in as <span className="text-white font-bold">{user?.name || 'Huzaifa Shah'}</span>
+          </div>
           <button
             onClick={handleLogout}
-            className="w-full flex items-center px-4 py-3 text-sm font-bold text-slate-400 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-colors tracking-wide"
+            className="w-full flex items-center px-4 py-2.5 text-sm font-bold text-slate-400 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-colors tracking-wide"
           >
             <LogOut className="w-5 h-5 mr-3" />
             Logout
@@ -122,11 +130,16 @@ export default function AdminLayout({ children }) {
       <main className="flex-1 flex flex-col h-full overflow-hidden relative">
         {/* Mobile Header */}
         <header className="lg:hidden h-20 bg-white border-b border-gray-200 flex items-center justify-between px-4 shrink-0">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-black text-white flex items-center justify-center font-black text-lg rounded-sm">
-              SS
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 bg-black text-white flex items-center justify-center font-black text-xs rounded-md">
+              HS
             </div>
-            <span className="font-black tracking-widest text-sm uppercase">Admin Panel</span>
+            <div className="flex flex-col">
+              <span className="font-black tracking-widest text-xs uppercase text-black">
+                {user?.name || 'Huzaifa Shah'}
+              </span>
+              <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Admin Panel</span>
+            </div>
           </div>
           <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 text-gray-500 hover:text-black hover:bg-gray-100 rounded-lg">
             <Menu className="w-6 h-6" />
