@@ -86,7 +86,7 @@ export default function LoginView({ onLoginSuccess }) {
               autoComplete="off"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter admin ID (huzaifashah)"
+              placeholder="Enter admin ID or email"
               className="w-full bg-[#0d0e14] border border-white/[0.08] focus:border-blue-500/60 rounded-2xl px-4 py-3 text-xs text-white placeholder-zinc-500 focus:outline-none transition-all duration-200"
             />
           </div>
