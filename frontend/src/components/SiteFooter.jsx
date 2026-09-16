@@ -83,7 +83,7 @@ export default function SiteFooter() {
         </div>
         
         <div className="border-t border-gray-700 pt-8 text-center text-xs text-gray-400">
-          © {new Date().getFullYear()} Sanitary Store. All Rights Reserved.
+          © {new Date().getFullYear()} Power Flow. All Rights Reserved.
         </div>
       </footer>
 
