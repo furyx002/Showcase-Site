@@ -52,7 +52,7 @@ export default function SiteFooter() {
             <ul className="space-y-3 text-[13px] leading-relaxed">
               <li><span className="text-white">Office Address:</span> Lahore, Punjab, Pakistan</li>
               <li><span className="text-white">Contact:</span> {whatsappNumber}</li>
-              <li><span className="text-white">Email:</span> info@sanitarystore.com</li>
+              <li><span className="text-white">Email:</span> <a href="mailto:h2h.powerflow@gmail.com" className="hover:text-white transition-colors">h2h.powerflow@gmail.com</a></li>
             </ul>
           </div>
 
