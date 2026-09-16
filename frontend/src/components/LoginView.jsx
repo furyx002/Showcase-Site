@@ -74,19 +74,19 @@ export default function LoginView({ onLoginSuccess }) {
             </div>
           )}
 
-          {/* Email Input */}
+          {/* ID / Email Input */}
           <div className="space-y-1.5">
             <label className="text-xs font-semibold text-zinc-300 flex items-center space-x-1.5">
               <Mail className="w-3.5 h-3.5 text-blue-400" />
-              <span>Admin Email</span>
+              <span>Admin ID / Email</span>
             </label>
             <input
-              type="email"
+              type="text"
               required
               autoComplete="off"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter admin email address"
+              placeholder="Enter admin ID (huzaifashah)"
               className="w-full bg-[#0d0e14] border border-white/[0.08] focus:border-blue-500/60 rounded-2xl px-4 py-3 text-xs text-white placeholder-zinc-500 focus:outline-none transition-all duration-200"
             />
           </div>

@@ -56,7 +56,7 @@ async function start() {
   app.listen(PORT, () => {
     console.log(`=================================================`);
     console.log(` 📦 SANITARY STORE BACKEND SERVER RUNNING       `);
-    console.log(` 🔑 Admin Account: admin@sanitary.com / furyisop56`);
+    console.log(` 🔑 Admin Account: huzaifashah / huzaifashah01`);
     console.log(` 🚀 Listening on: http://localhost:${PORT}        `);
     console.log(` 📊 Health Check: http://localhost:${PORT}/api/health`);
     console.log(`=================================================`);
