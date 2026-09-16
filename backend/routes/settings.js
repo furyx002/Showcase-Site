@@ -6,8 +6,6 @@ const Setting = require('../models/Setting');
 const DEFAULT_SETTINGS = {
   whatsappNumber: '+923006255511',
   heroSliders: ['/slider1.jpg', '/slider2.jpg'],
-  marqueeEnabled: true,
-  marqueeText: 'LIMITED TIME OFFER: ENJOY FREE SHIPPING NATIONWIDE ON ALL ORDERS THIS WEEK!',
   faqs: [
     {
       question: "What material are your faucets and showers made of?",

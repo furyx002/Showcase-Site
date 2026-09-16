@@ -106,22 +106,6 @@ html.dark .posline-card:hover {
   animation: statusPulse 2s infinite;
 }
 
-@keyframes marquee {
-  0% { transform: translateX(0%); }
-  100% { transform: translateX(-100%); }
-}
-
-.animate-marquee {
-  display: inline-block;
-  white-space: nowrap;
-  animation: marquee 20s linear infinite;
-}
-
-.animate-marquee-container {
-  overflow: hidden;
-  position: relative;
-  display: flex;
-}
 
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(20px); }

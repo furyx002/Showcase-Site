@@ -29,24 +29,6 @@ export default function SiteHeader() {
 
   return (
     <>
-      {/* Top Banner */}
-      {settings?.marqueeEnabled !== false && (
-        <div className="bg-black text-white text-[10px] sm:text-xs py-2 flex items-center tracking-wider font-medium overflow-hidden whitespace-nowrap">
-          <div className="animate-marquee shrink-0 min-w-full flex justify-around">
-            <span className="mx-16">{settings?.marqueeText || 'LIMITED TIME OFFER: ENJOY FREE SHIPPING NATIONWIDE'}</span>
-            <span className="mx-16">{settings?.marqueeText || 'LIMITED TIME OFFER: ENJOY FREE SHIPPING NATIONWIDE'}</span>
-            <span className="mx-16">{settings?.marqueeText || 'LIMITED TIME OFFER: ENJOY FREE SHIPPING NATIONWIDE'}</span>
-            <span className="mx-16">{settings?.marqueeText || 'LIMITED TIME OFFER: ENJOY FREE SHIPPING NATIONWIDE'}</span>
-          </div>
-          <div className="animate-marquee shrink-0 min-w-full flex justify-around" aria-hidden="true">
-            <span className="mx-16">{settings?.marqueeText || 'LIMITED TIME OFFER: ENJOY FREE SHIPPING NATIONWIDE'}</span>
-            <span className="mx-16">{settings?.marqueeText || 'LIMITED TIME OFFER: ENJOY FREE SHIPPING NATIONWIDE'}</span>
-            <span className="mx-16">{settings?.marqueeText || 'LIMITED TIME OFFER: ENJOY FREE SHIPPING NATIONWIDE'}</span>
-            <span className="mx-16">{settings?.marqueeText || 'LIMITED TIME OFFER: ENJOY FREE SHIPPING NATIONWIDE'}</span>
-          </div>
-        </div>
-      )}
-
       {/* Main Header */}
       <header className="bg-white border-b border-gray-100 sticky top-0 z-40">
         <div className="max-w-[1600px] mx-auto px-4 lg:px-8 py-4 lg:py-5 flex items-center justify-between">

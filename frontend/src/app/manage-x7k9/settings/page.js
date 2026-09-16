@@ -88,33 +88,6 @@ export default function SettingsPage() {
             </div>
           </section>
 
-          {/* Marquee Info */}
-          <section>
-            <h3 className="text-sm font-black text-black mb-4 uppercase tracking-widest border-b border-gray-100 pb-2">Marquee Banner</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Enable Marquee</label>
-                <select
-                  value={settings.marqueeEnabled === false ? 'false' : 'true'}
-                  onChange={(e) => setSettings({ ...settings, marqueeEnabled: e.target.value === 'true' })}
-                  className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-black rounded-lg px-4 py-3 text-sm text-black font-semibold outline-none transition-colors"
-                >
-                  <option value="true">Enabled</option>
-                  <option value="false">Disabled</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Marquee Text</label>
-                <input
-                  type="text"
-                  value={settings.marqueeText || ''}
-                  onChange={(e) => setSettings({ ...settings, marqueeText: e.target.value })}
-                  className="w-full bg-gray-50 border border-gray-200 focus:bg-white focus:border-black rounded-lg px-4 py-3 text-sm text-black font-semibold outline-none transition-colors"
-                  placeholder="e.g. LIMITED TIME OFFER..."
-                />
-              </div>
-            </div>
-          </section>
 
           {/* Sliders */}
           <section>
