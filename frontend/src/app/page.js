@@ -16,7 +16,7 @@ export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const { settings } = useSettings();
 
-  const whatsappNumber = settings?.whatsappNumber || '+923006255511';
+  const whatsappNumber = settings?.whatsappNumber || '+923401013889';
   const activeSliders = (settings?.heroSliders || []).filter(url => url && url.trim() !== '');
   const heroSliders = activeSliders.length > 0 ? activeSliders : ['/slider1.jpg', '/slider2.jpg'];
 

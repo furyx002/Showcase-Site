@@ -9,7 +9,7 @@ import { useSettings } from '../lib/useSettings';
 export default function SiteFooter() {
   const pathname = usePathname();
   const { settings } = useSettings();
-  const whatsappNumber = settings?.whatsappNumber || '+923006255511';
+  const whatsappNumber = settings?.whatsappNumber || '+923401013889';
 
   if (pathname && (pathname.startsWith('/admin') || pathname.startsWith('/manage-x7k9'))) {
     return null;

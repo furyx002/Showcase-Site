@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, X, MessageCircle } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { useSettings } from '../lib/useSettings';
 
 export default function SiteHeader() {
@@ -31,38 +31,40 @@ export default function SiteHeader() {
     <>
       {/* Main Header */}
       <header className="bg-white border-b border-gray-100 sticky top-0 z-40 shadow-xs">
-        <div className="max-w-[1600px] mx-auto px-4 lg:px-10 py-3 lg:py-4 flex items-center justify-between relative">
-          
-          {/* Left: Mobile Menu Button & Desktop Logo */}
-          <div className="flex items-center">
-            <button 
-              onClick={() => setSidebarOpen(true)}
-              className="p-2 -ml-2 text-gray-800 hover:text-black transition-colors z-10 lg:hidden"
-              aria-label="Open Menu"
-            >
-              <Menu className="w-6 h-6 sm:w-7 sm:h-7" />
-            </button>
+        {/* Mobile Header Bar */}
+        <div className="lg:hidden max-w-[1600px] mx-auto px-4 py-4 sm:py-5 flex items-center justify-between relative min-h-[72px] sm:min-h-[84px] overflow-hidden">
+          <button 
+            onClick={() => setSidebarOpen(true)}
+            className="p-2 -ml-2 text-gray-800 hover:text-black transition-colors z-10"
+            aria-label="Open Menu"
+          >
+            <Menu className="w-7 h-7 sm:w-8 sm:h-8" />
+          </button>
 
-            <Link href="/" className="hidden lg:flex items-center group">
-              <img 
-                src="/logo.png" 
-                alt="Power Flow Logo" 
-                className="h-9 lg:h-11 w-auto object-contain transition-transform group-hover:scale-105" 
-              />
-            </Link>
-          </div>
-          
-          {/* Mobile Logo (Centered) */}
-          <Link href="/" className="lg:hidden absolute left-1/2 -translate-x-1/2 flex items-center justify-center z-0">
+          <Link href="/" className="absolute left-1/2 -translate-x-1/2 flex items-center justify-center z-0">
             <img 
               src="/logo.png" 
               alt="Power Flow Logo" 
-              className="h-8 sm:h-10 w-auto object-contain" 
+              className="h-12 sm:h-16 w-auto object-contain scale-[2.2] sm:scale-[2.6]" 
             />
           </Link>
 
-          {/* Desktop Navigation Links (Centered mathematically) */}
-          <nav className="hidden lg:flex items-center space-x-8 xl:space-x-10 text-[11px] xl:text-xs font-black tracking-[0.16em] text-gray-800 absolute left-1/2 -translate-x-1/2">
+          <div className="w-7 h-7 sm:w-8 sm:h-8 z-10"></div>
+        </div>
+
+        {/* Desktop Header (Logo on Left, Nav items shifted a bit right) */}
+        <div className="hidden lg:flex max-w-[1600px] mx-auto px-8 lg:px-12 py-4 items-center relative min-h-[90px]">
+          {/* Left: Logo */}
+          <Link href="/" className="flex items-center group shrink-0">
+            <img 
+              src="/logo.png" 
+              alt="Power Flow Logo" 
+              className="h-14 lg:h-18 xl:h-20 w-auto object-contain transition-transform duration-300 group-hover:scale-105" 
+            />
+          </Link>
+
+          {/* Navigation Links (Shifted right to match screenshot positioning) */}
+          <nav className="flex items-center space-x-8 xl:space-x-10 text-xs font-black tracking-[0.18em] text-gray-800 ml-24 lg:ml-40 xl:ml-56">
             <Link href="/" className={`hover:text-yellow-600 transition-colors uppercase py-2 relative ${isActive('/') ? 'text-yellow-600 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-yellow-500 after:rounded-full' : ''}`}>
               HOME
             </Link>
@@ -83,22 +85,6 @@ export default function SiteHeader() {
               FAQ
             </Link>
           </nav>
-
-          {/* Right Action / Contact Button */}
-          <div className="flex items-center space-x-3">
-            <a 
-              href={`https://wa.me/${(settings?.whatsappNumber || '+923006255511').replace(/[^0-9]/g, '')}`} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="hidden lg:flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-black tracking-wider uppercase px-4 py-2 rounded-full transition-all shadow-sm hover:shadow hover:-translate-y-0.5"
-            >
-              <MessageCircle className="w-3.5 h-3.5 fill-current" />
-              <span>Contact Us</span>
-            </a>
-
-            {/* Mobile Right Balance Spacer */}
-            <div className="w-6 h-6 lg:hidden z-10"></div>
-          </div>
         </div>
       </header>
 

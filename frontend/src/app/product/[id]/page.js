@@ -15,7 +15,7 @@ export default function ProductDetails() {
   const [error, setError] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
   const { settings } = useSettings();
-  const whatsappNumber = settings?.whatsappNumber || '+923006255511';
+  const whatsappNumber = settings?.whatsappNumber || '+923401013889';
 
   useEffect(() => {
     loadProduct();

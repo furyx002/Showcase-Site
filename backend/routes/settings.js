@@ -4,7 +4,7 @@ const Setting = require('../models/Setting');
 
 // Default settings if not found in DB
 const DEFAULT_SETTINGS = {
-  whatsappNumber: '+923006255511',
+  whatsappNumber: '+923401013889',
   heroSliders: ['/slider1.jpg', '/slider2.jpg'],
   faqs: [
     {

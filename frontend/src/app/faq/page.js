@@ -83,7 +83,7 @@ export default function FAQPage() {
         <div className="mt-16 text-center">
           <p className="text-gray-500 mb-6 font-medium">Still have questions? We're just a message away.</p>
           <a 
-            href={`https://wa.me/923006255511`}
+            href={`https://wa.me/923401013889`}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold py-3 px-8 rounded-full shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5"

@@ -5,7 +5,7 @@ import { api } from './api';
 
 export function useSettings() {
   const [settings, setSettings] = useState({
-    whatsappNumber: '+923006255511',
+    whatsappNumber: '+923401013889',
     heroSliders: ['/slider1.jpg', '/slider2.jpg']
   });
   const [loading, setLoading] = useState(true);
