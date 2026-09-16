@@ -33,17 +33,27 @@ export default function SiteHeader() {
       <header className="bg-white border-b border-gray-100 sticky top-0 z-40">
         <div className="max-w-[1600px] mx-auto px-4 lg:px-8 py-4 lg:py-5 flex items-center justify-between">
           
-          {/* Left: Menu Button */}
-          <button 
-            onClick={() => setSidebarOpen(true)}
-            className="p-2 -ml-2 text-gray-800 hover:text-black transition-colors z-10"
-            aria-label="Open Menu"
-          >
-            <Menu className="w-7 h-7 sm:w-8 sm:h-8" />
-          </button>
+          {/* Left: Mobile Menu Button & Desktop Logo */}
+          <div className="flex items-center space-x-6">
+            <button 
+              onClick={() => setSidebarOpen(true)}
+              className="p-2 -ml-2 text-gray-800 hover:text-black transition-colors z-10 lg:hidden"
+              aria-label="Open Menu"
+            >
+              <Menu className="w-7 h-7 sm:w-8 sm:h-8" />
+            </button>
+
+            <Link href="/" className="hidden lg:flex items-center z-10">
+              <img 
+                src="/logo.png" 
+                alt="Power Flow Logo" 
+                className="h-12 lg:h-14 w-auto object-contain scale-[2] origin-left" 
+              />
+            </Link>
+          </div>
           
-          {/* Center: Logo */}
-          <Link href="/" className="absolute left-1/2 -translate-x-1/2 flex items-center justify-center z-0">
+          {/* Mobile Logo (Centered) */}
+          <Link href="/" className="lg:hidden absolute left-1/2 -translate-x-1/2 flex items-center justify-center z-0">
             <img 
               src="/logo.png" 
               alt="Power Flow Logo" 
@@ -51,19 +61,42 @@ export default function SiteHeader() {
             />
           </Link>
 
-          {/* Right: Invisible Spacer to balance the flex container (or could be cart/search icon in future) */}
-          <div className="w-7 h-7 sm:w-8 sm:h-8 z-10"></div>
+          {/* Desktop Navigation Links */}
+          <nav className="hidden lg:flex items-center space-x-8 text-xs font-black tracking-widest text-gray-700">
+            <Link href="/" className={`hover:text-yellow-500 transition-colors uppercase py-1.5 border-b-2 ${isActive('/') ? 'text-yellow-500 border-yellow-500' : 'border-transparent'}`}>
+              HOME
+            </Link>
+            <Link href="/collections" className={`hover:text-yellow-500 transition-colors uppercase py-1.5 border-b-2 ${isActive('/collections') ? 'text-yellow-500 border-yellow-500' : 'border-transparent'}`}>
+              COLLECTIONS
+            </Link>
+            <Link href="/best-seller" className={`hover:text-yellow-500 transition-colors uppercase py-1.5 border-b-2 ${isActive('/best-seller') ? 'text-yellow-500 border-yellow-500' : 'border-transparent'}`}>
+              BEST SELLER
+            </Link>
+            <Link href="/new-arrivals" className={`hover:text-yellow-500 transition-colors uppercase py-1.5 border-b-2 flex items-center gap-1.5 ${isActive('/new-arrivals') ? 'text-yellow-500 border-yellow-500' : 'border-transparent'}`}>
+              <span>NEW ARRIVALS</span>
+              <span className="bg-yellow-500 text-black text-[9px] px-1.5 py-0.5 font-black rounded-sm leading-none">NEW</span>
+            </Link>
+            <Link href="/shop-all" className={`hover:text-yellow-500 transition-colors uppercase py-1.5 border-b-2 ${isActive('/shop-all') ? 'text-yellow-500 border-yellow-500' : 'border-transparent'}`}>
+              SHOP ALL
+            </Link>
+            <Link href="/faq" className={`hover:text-yellow-500 transition-colors uppercase py-1.5 border-b-2 ${isActive('/faq') ? 'text-yellow-500 border-yellow-500' : 'border-transparent'}`}>
+              FAQ
+            </Link>
+          </nav>
+
+          {/* Mobile Balance Spacer */}
+          <div className="w-7 h-7 sm:w-8 sm:h-8 lg:hidden z-10"></div>
         </div>
       </header>
 
-      {/* Sidebar Overlay */}
+      {/* Sidebar Overlay (Mobile Only) */}
       <div 
-        className={`fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] transition-opacity duration-300 ${sidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        className={`fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] transition-opacity duration-300 lg:hidden ${sidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
         onClick={() => setSidebarOpen(false)}
       />
 
-      {/* Sidebar Content */}
-      <div className={`fixed top-0 left-0 h-full w-[80vw] max-w-sm bg-white z-[110] shadow-2xl transform transition-transform duration-300 ease-in-out flex flex-col ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+      {/* Sidebar Content (Mobile Only) */}
+      <div className={`fixed top-0 left-0 h-full w-[80vw] max-w-sm bg-white z-[110] shadow-2xl transform transition-transform duration-300 ease-in-out flex flex-col lg:hidden ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         
         {/* Sidebar Header */}
         <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-gray-50">
@@ -76,7 +109,7 @@ export default function SiteHeader() {
           </button>
         </div>
 
-        {/* Navigation Links */}
+        {/* Mobile Navigation Links */}
         <nav className="flex-1 overflow-y-auto py-6 px-6 flex flex-col space-y-6 text-sm font-bold text-gray-700 tracking-widest">
           <Link href="/" onClick={() => setSidebarOpen(false)} className={`flex items-center hover:text-yellow-500 transition-colors ${isActive('/') ? 'text-yellow-500' : ''}`}>
             HOME
