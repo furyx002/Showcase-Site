@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, MessageCircle } from 'lucide-react';
 import { useSettings } from '../lib/useSettings';
 
 export default function SiteHeader() {
@@ -30,24 +30,24 @@ export default function SiteHeader() {
   return (
     <>
       {/* Main Header */}
-      <header className="bg-white border-b border-gray-100 sticky top-0 z-40">
-        <div className="max-w-[1600px] mx-auto px-4 lg:px-8 py-4 lg:py-5 flex items-center justify-between">
+      <header className="bg-white border-b border-gray-100 sticky top-0 z-40 shadow-xs">
+        <div className="max-w-[1600px] mx-auto px-4 lg:px-10 py-3 lg:py-4 flex items-center justify-between relative">
           
           {/* Left: Mobile Menu Button & Desktop Logo */}
-          <div className="flex items-center space-x-6">
+          <div className="flex items-center">
             <button 
               onClick={() => setSidebarOpen(true)}
               className="p-2 -ml-2 text-gray-800 hover:text-black transition-colors z-10 lg:hidden"
               aria-label="Open Menu"
             >
-              <Menu className="w-7 h-7 sm:w-8 sm:h-8" />
+              <Menu className="w-6 h-6 sm:w-7 sm:h-7" />
             </button>
 
-            <Link href="/" className="hidden lg:flex items-center z-10">
+            <Link href="/" className="hidden lg:flex items-center group">
               <img 
                 src="/logo.png" 
                 alt="Power Flow Logo" 
-                className="h-12 lg:h-14 w-auto object-contain scale-[2] origin-left" 
+                className="h-9 lg:h-11 w-auto object-contain transition-transform group-hover:scale-105" 
               />
             </Link>
           </div>
@@ -57,35 +57,48 @@ export default function SiteHeader() {
             <img 
               src="/logo.png" 
               alt="Power Flow Logo" 
-              className="h-12 sm:h-16 w-auto object-contain scale-[2.2] sm:scale-[2.5]" 
+              className="h-8 sm:h-10 w-auto object-contain" 
             />
           </Link>
 
-          {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center space-x-8 text-xs font-black tracking-widest text-gray-700">
-            <Link href="/" className={`hover:text-yellow-500 transition-colors uppercase py-1.5 border-b-2 ${isActive('/') ? 'text-yellow-500 border-yellow-500' : 'border-transparent'}`}>
+          {/* Desktop Navigation Links (Centered mathematically) */}
+          <nav className="hidden lg:flex items-center space-x-8 xl:space-x-10 text-[11px] xl:text-xs font-black tracking-[0.16em] text-gray-800 absolute left-1/2 -translate-x-1/2">
+            <Link href="/" className={`hover:text-yellow-600 transition-colors uppercase py-2 relative ${isActive('/') ? 'text-yellow-600 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-yellow-500 after:rounded-full' : ''}`}>
               HOME
             </Link>
-            <Link href="/collections" className={`hover:text-yellow-500 transition-colors uppercase py-1.5 border-b-2 ${isActive('/collections') ? 'text-yellow-500 border-yellow-500' : 'border-transparent'}`}>
+            <Link href="/collections" className={`hover:text-yellow-600 transition-colors uppercase py-2 relative ${isActive('/collections') ? 'text-yellow-600 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-yellow-500 after:rounded-full' : ''}`}>
               COLLECTIONS
             </Link>
-            <Link href="/best-seller" className={`hover:text-yellow-500 transition-colors uppercase py-1.5 border-b-2 ${isActive('/best-seller') ? 'text-yellow-500 border-yellow-500' : 'border-transparent'}`}>
+            <Link href="/best-seller" className={`hover:text-yellow-600 transition-colors uppercase py-2 relative ${isActive('/best-seller') ? 'text-yellow-600 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-yellow-500 after:rounded-full' : ''}`}>
               BEST SELLER
             </Link>
-            <Link href="/new-arrivals" className={`hover:text-yellow-500 transition-colors uppercase py-1.5 border-b-2 flex items-center gap-1.5 ${isActive('/new-arrivals') ? 'text-yellow-500 border-yellow-500' : 'border-transparent'}`}>
+            <Link href="/new-arrivals" className={`hover:text-yellow-600 transition-colors uppercase py-2 relative flex items-center gap-1.5 ${isActive('/new-arrivals') ? 'text-yellow-600 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-yellow-500 after:rounded-full' : ''}`}>
               <span>NEW ARRIVALS</span>
               <span className="bg-yellow-500 text-black text-[9px] px-1.5 py-0.5 font-black rounded-sm leading-none">NEW</span>
             </Link>
-            <Link href="/shop-all" className={`hover:text-yellow-500 transition-colors uppercase py-1.5 border-b-2 ${isActive('/shop-all') ? 'text-yellow-500 border-yellow-500' : 'border-transparent'}`}>
+            <Link href="/shop-all" className={`hover:text-yellow-600 transition-colors uppercase py-2 relative ${isActive('/shop-all') ? 'text-yellow-600 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-yellow-500 after:rounded-full' : ''}`}>
               SHOP ALL
             </Link>
-            <Link href="/faq" className={`hover:text-yellow-500 transition-colors uppercase py-1.5 border-b-2 ${isActive('/faq') ? 'text-yellow-500 border-yellow-500' : 'border-transparent'}`}>
+            <Link href="/faq" className={`hover:text-yellow-600 transition-colors uppercase py-2 relative ${isActive('/faq') ? 'text-yellow-600 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-yellow-500 after:rounded-full' : ''}`}>
               FAQ
             </Link>
           </nav>
 
-          {/* Mobile Balance Spacer */}
-          <div className="w-7 h-7 sm:w-8 sm:h-8 lg:hidden z-10"></div>
+          {/* Right Action / Contact Button */}
+          <div className="flex items-center space-x-3">
+            <a 
+              href={`https://wa.me/${(settings?.whatsappNumber || '+923006255511').replace(/[^0-9]/g, '')}`} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="hidden lg:flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-black tracking-wider uppercase px-4 py-2 rounded-full transition-all shadow-sm hover:shadow hover:-translate-y-0.5"
+            >
+              <MessageCircle className="w-3.5 h-3.5 fill-current" />
+              <span>Contact Us</span>
+            </a>
+
+            {/* Mobile Right Balance Spacer */}
+            <div className="w-6 h-6 lg:hidden z-10"></div>
+          </div>
         </div>
       </header>
 
